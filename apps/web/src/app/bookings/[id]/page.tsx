@@ -127,7 +127,7 @@ async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>[
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                <ClipboardList className="size-5 text-amber" aria-hidden="true" />
+                <ClipboardList className="size-5 text-pop" aria-hidden="true" />
                 {booking.petName}&apos;s training plan
               </CardTitle>
             </CardHeader>

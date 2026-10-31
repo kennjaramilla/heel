@@ -12,9 +12,7 @@ const tabs = [
 export default function AdminLayout({ children }: LayoutProps<'/admin'>) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-      <p className="font-heading text-sm font-semibold tracking-wide text-primary uppercase">
-        Admin
-      </p>
+      <p className="font-heading text-sm font-semibold text-primary">Admin</p>
       <nav aria-label="Admin" className="mt-3 flex flex-wrap gap-1 border-b border-border">
         {tabs.map((t) => (
           <Link

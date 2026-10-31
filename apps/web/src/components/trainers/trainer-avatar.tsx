@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 const tones = [
   'bg-secondary text-secondary-foreground',
   'bg-accent text-accent-foreground',
-  'bg-peach/35 text-foreground',
+  'bg-ball text-ball-foreground',
 ];
 
 export function initials(name: string) {

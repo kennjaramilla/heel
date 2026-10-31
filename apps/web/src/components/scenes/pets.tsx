@@ -44,7 +44,7 @@ export function Dog({
         width={9}
         height={14}
         rx={3}
-        fill="#1f6f5c"
+        fill="#2e3fbf"
         transform="rotate(-20 70 33)"
       />
       <circle cx={84} cy={26} r={17} fill={coat} />
@@ -61,7 +61,7 @@ export function Dog({
         fill="none"
         strokeLinecap="round"
       />
-      <circle cx={68} cy={40} r={3.2} fill="#e8a33d" stroke="#fbf7f0" strokeWidth={1.2} />
+      <circle cx={68} cy={40} r={3.2} fill="#e8a33d" stroke="#f5f6fb" strokeWidth={1.2} />
     </g>
   );
 }
@@ -126,15 +126,15 @@ export function Trainer({ armClassName }: { armClassName?: string }) {
     <g>
       <rect x={14} y={78} width={11} height={44} rx={5} fill="#24302c" />
       <rect x={30} y={78} width={11} height={44} rx={5} fill="#24302c" />
-      <rect x={8} y={30} width={40} height={56} rx={16} fill="#1f6f5c" />
-      <path d="M20 34 L 28 48 L 36 34" stroke="#fbf7f0" strokeWidth={3} fill="none" />
+      <rect x={8} y={30} width={40} height={56} rx={16} fill="#2e3fbf" />
+      <path d="M20 34 L 28 48 L 36 34" stroke="#f5f6fb" strokeWidth={3} fill="none" />
       {/* Arm reaching toward the dog with a treat. */}
       <g className={armClassName}>
-        <rect x={-22} y={38} width={36} height={11} rx={5.5} fill="#1f6f5c" />
+        <rect x={-22} y={38} width={36} height={11} rx={5.5} fill="#2e3fbf" />
         <circle cx={-24} cy={43.5} r={7} fill="#c98d66" />
         <path
           d="M-38 36 a3 3 0 1 1 4 -3 l 6 0 a3 3 0 1 1 4 3 a3 3 0 1 1 -4 3 l -6 0 a3 3 0 1 1 -4 -3 z"
-          fill="#fbf7f0"
+          fill="#f5f6fb"
           stroke="#b97a22"
           strokeWidth={1.2}
         />
