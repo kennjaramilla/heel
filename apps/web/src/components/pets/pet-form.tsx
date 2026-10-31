@@ -2,22 +2,23 @@
 
 import { SPECIALTIES } from '@heel/core';
 import { Cat, Dog } from 'lucide-react';
-import { useActionState } from 'react';
+
 import { type PetFormState, savePet } from '@/app/dashboard/pets/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useFormAction } from '@/lib/use-form-action';
 import type { Pet } from '@/server/pets';
 
 const initialState: PetFormState = {};
 
 export function PetForm({ pet }: { pet?: Pet }) {
-  const [state, action, pending] = useActionState(savePet, initialState);
+  const [state, onSubmit, pending] = useFormAction(savePet, initialState);
   const errors = state.fieldErrors ?? {};
 
   return (
     <form
-      action={action}
+      onSubmit={onSubmit}
       className="grid gap-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
     >
       {pet && <input type="hidden" name="id" value={pet.id} />}
