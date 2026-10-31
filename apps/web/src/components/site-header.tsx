@@ -4,7 +4,7 @@ import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 
 const nav = [
-  { href: '/#trainers', label: 'Find a trainer' },
+  { href: '/trainers', label: 'Find a trainer' },
   { href: '/#how-it-works', label: 'How it works' },
   { href: '/#for-trainers', label: 'For trainers' },
 ];
