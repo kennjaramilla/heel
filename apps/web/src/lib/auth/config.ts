@@ -1,8 +1,10 @@
 import type { Db } from '@heel/db';
 import { schema } from '@heel/db';
 import { betterAuth } from 'better-auth';
+import { APIError } from 'better-auth/api';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
+import { eq } from 'drizzle-orm';
 
 /** Roles a person can pick at sign-up. Admins are only ever created by a seed or an admin. */
 export const SELF_SERVE_ROLES = ['owner', 'trainer'] as const;
@@ -44,6 +46,22 @@ export function createAuth(db: Db) {
       },
     },
     databaseHooks: {
+      session: {
+        create: {
+          // Suspended accounts can't start a session. Their existing sessions are deleted on suspension.
+          before: async (session) => {
+            const [row] = await db
+              .select({ suspendedAt: schema.user.suspendedAt })
+              .from(schema.user)
+              .where(eq(schema.user.id, session.userId));
+            if (row?.suspendedAt) {
+              throw new APIError('FORBIDDEN', {
+                message: 'This account is suspended. Contact support.',
+              });
+            }
+          },
+        },
+      },
       user: {
         create: {
           // Never trust the client with roles: anything but owner/trainer becomes owner.

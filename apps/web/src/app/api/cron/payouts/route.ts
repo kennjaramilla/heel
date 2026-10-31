@@ -1,4 +1,5 @@
 import { getDb } from '@/lib/auth/server';
+import { recordAudit } from '@/server/audit';
 import { autoCompleteConsults, releaseDuePayouts } from '@/server/completion';
 import { getPaymentProvider } from '@/server/payments';
 
@@ -12,5 +13,13 @@ export async function GET(request: Request) {
   const provider = getPaymentProvider();
   const completed = await autoCompleteConsults(db);
   const paid = await releaseDuePayouts(db, (booking) => provider.payout(booking));
-  return Response.json({ completed, paid });
+  for (const id of paid) {
+    await recordAudit(db, {
+      actorId: null,
+      action: 'payout.released',
+      targetType: 'booking',
+      targetId: id,
+    });
+  }
+  return Response.json({ completed, paid: paid.length });
 }

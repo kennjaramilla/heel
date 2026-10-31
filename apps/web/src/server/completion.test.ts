@@ -116,9 +116,15 @@ describe('payouts', () => {
     await saveTrainingPlan(db, 'sam', id, plan, afterEnd);
     const log: string[] = [];
 
-    expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-03T10:00:00Z'))).toBe(0);
-    expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-03T17:00:00Z'))).toBe(1);
-    expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-04T17:00:00Z'))).toBe(0);
+    expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-03T10:00:00Z'))).toEqual(
+      [],
+    );
+    expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-03T17:00:00Z'))).toEqual([
+      id,
+    ]);
+    expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-04T17:00:00Z'))).toEqual(
+      [],
+    );
     expect(log).toEqual([`${id}:3825`]);
     expect(await status()).toMatchObject({ payoutStatus: 'paid', payoutRef: `payout_${id}` });
     expect(await trainerEarnings(db, 'sam')).toEqual({ pending: 0, paid: 3825, upcoming: 0 });

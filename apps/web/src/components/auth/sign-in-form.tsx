@@ -27,7 +27,13 @@ export function SignInForm() {
     });
     setPending(false);
     if (error) {
-      setError(error.status === 401 ? 'Wrong email or password.' : 'Could not sign in. Try again.');
+      setError(
+        error.status === 401
+          ? 'Wrong email or password.'
+          : error.status === 403 && error.message
+            ? error.message
+            : 'Could not sign in. Try again.',
+      );
       return;
     }
     router.push(next);

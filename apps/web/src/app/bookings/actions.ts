@@ -10,6 +10,7 @@ import {
   getBookingForUser,
   releaseHold,
 } from '@/server/bookings';
+import { recordAudit } from '@/server/audit';
 import { getPaymentProvider } from '@/server/payments';
 
 export type HoldState = { message?: string };
@@ -55,12 +56,21 @@ export async function payForBooking(bookingId: string) {
   if (checkout.kind === 'redirect') redirect(checkout.url);
 
   // If the hold ran out while paying, confirmBooking returns null and the page shows "expired".
-  await confirmBooking(db, {
+  const confirmed = await confirmBooking(db, {
     bookingId,
     ownerId: owner.id,
     provider: provider.name,
     paymentRef: checkout.paymentRef,
   });
+  if (confirmed) {
+    await recordAudit(db, {
+      actorId: owner.id,
+      action: 'booking.confirmed',
+      targetType: 'booking',
+      targetId: bookingId,
+      details: { priceCents: confirmed.priceCents, provider: provider.name },
+    });
+  }
   redirect(`/bookings/${bookingId}`);
 }
 
@@ -79,8 +89,9 @@ export async function cancelBookingAction(
   const user = await requireUser(['owner', 'trainer']);
   const bookingId = String(form.get('bookingId') ?? '');
   const provider = getPaymentProvider();
+  const db = getDb();
   const result = await cancelBooking(
-    getDb(),
+    db,
     {
       bookingId,
       userId: user.id,
@@ -90,6 +101,13 @@ export async function cancelBookingAction(
     (booking, cents) => provider.refund(booking, cents),
   );
   if (!result.ok) return { message: cancelErrors[result.error] };
+  await recordAudit(db, {
+    actorId: user.id,
+    action: 'booking.cancelled',
+    targetType: 'booking',
+    targetId: bookingId,
+    details: { by: user.role, refundCents: result.booking.refundCents },
+  });
   redirect(`/bookings/${bookingId}`);
 }
 

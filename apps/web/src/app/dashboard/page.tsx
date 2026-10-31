@@ -72,7 +72,12 @@ const nextSteps: Record<
     { icon: CreditCard, title: 'Connect payouts', body: 'Get paid after each consult via Stripe.' },
   ],
   admin: [
-    { icon: ShieldCheck, title: 'Admin tools', body: 'Users, bookings, refunds and support.' },
+    {
+      icon: ShieldCheck,
+      title: 'Admin tools',
+      body: 'Users, bookings, refunds and the audit log.',
+      href: '/admin',
+    },
   ],
 };
 

@@ -3,6 +3,7 @@
 import { trainingPlanInput } from '@heel/core';
 import { redirect } from 'next/navigation';
 import { getDb, requireUser } from '@/lib/auth/server';
+import { recordAudit } from '@/server/audit';
 import { saveTrainingPlan } from '@/server/completion';
 
 export type PlanState = { message?: string };
@@ -21,7 +22,14 @@ export async function savePlanAction(_prev: PlanState, form: FormData): Promise<
     steps: form.getAll('step'),
   });
   if (!parsed.success) return { message: parsed.error.issues[0]?.message ?? 'Check the plan.' };
-  const result = await saveTrainingPlan(getDb(), trainer.id, bookingId, parsed.data);
+  const db = getDb();
+  const result = await saveTrainingPlan(db, trainer.id, bookingId, parsed.data);
   if (!result.ok) return { message: errors[result.error] };
+  await recordAudit(db, {
+    actorId: trainer.id,
+    action: 'plan.saved',
+    targetType: 'booking',
+    targetId: bookingId,
+  });
   redirect(`/bookings/${bookingId}`);
 }

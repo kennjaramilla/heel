@@ -383,6 +383,31 @@ async function main() {
       .onConflictDoNothing();
   }
 
+  // Admin login, only when a password is configured (never a public demo account).
+  if (process.env.ADMIN_PASSWORD) {
+    const adminHash = await hashPassword(process.env.ADMIN_PASSWORD);
+    await db
+      .insert(schema.user)
+      .values({
+        id: 'seed_admin',
+        name: 'Heel Admin',
+        email: 'admin@heel.dev',
+        role: 'admin',
+        emailVerified: true,
+      })
+      .onConflictDoNothing();
+    await db
+      .insert(schema.account)
+      .values({
+        id: 'seed_admin_credential',
+        accountId: 'seed_admin',
+        providerId: 'credential',
+        userId: 'seed_admin',
+        password: adminHash,
+      })
+      .onConflictDoUpdate({ target: schema.account.id, set: { password: adminHash } });
+  }
+
   console.log(`Seeded ${trainers.length} trainers, ${owners.length} owner and 2 pets.`);
   process.exit(0);
 }
