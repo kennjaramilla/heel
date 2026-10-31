@@ -11,7 +11,7 @@ import {
 } from '@heel/core';
 import type { Db } from '@heel/db';
 import { schema } from '@heel/db';
-import { and, asc, desc, eq, gt, gte, inArray, lt, lte, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, inArray, lt, lte, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { getAvailability } from './availability';
 import { getPet } from './pets';
@@ -77,7 +77,18 @@ export async function openSlots(
 
 export type HoldResult =
   | { ok: true; booking: Booking }
-  | { ok: false; error: 'trainer-not-found' | 'pet-not-found' | 'slot-unavailable' | 'slot-taken' };
+  | {
+      ok: false;
+      error:
+        | 'trainer-not-found'
+        | 'pet-not-found'
+        | 'slot-unavailable'
+        | 'slot-taken'
+        | 'too-many-holds';
+    };
+
+/** One owner can't sit on more than a few unpaid holds and block a trainer's calendar. */
+export const MAX_LIVE_HOLDS = 3;
 
 /**
  * Reserves a slot for the owner while they pay. The slot must be one the trainer actually offers;
@@ -96,6 +107,14 @@ export async function createHold(
   if (!pet) return { ok: false, error: 'pet-not-found' };
 
   await expireStaleHolds(db, now);
+  const [{ holds } = { holds: 0 }] = await db
+    .select({ holds: count() })
+    .from(booking)
+    .where(
+      and(eq(booking.ownerId, ownerId), eq(booking.status, 'held'), gt(booking.holdExpiresAt, now)),
+    );
+  if (holds >= MAX_LIVE_HOLDS) return { ok: false, error: 'too-many-holds' };
+
   const startsAt = new Date(request.startsAt);
   const slots = await openSlots(db, trainer, request.lengthMinutes, now);
   if (!slots.some((s) => s.getTime() === startsAt.getTime()))

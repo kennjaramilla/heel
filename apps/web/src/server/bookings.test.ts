@@ -148,6 +148,23 @@ describe('createHold', () => {
   });
 });
 
+describe('hold limit', () => {
+  it('stops an owner holding more than three unpaid slots at once', async () => {
+    const { db, olivesPet } = await setup();
+    const times = [
+      '2026-11-02T15:00:00.000Z',
+      '2026-11-02T16:00:00.000Z',
+      '2026-11-02T17:00:00.000Z',
+      '2026-11-02T18:00:00.000Z',
+    ];
+    const results = [];
+    for (const startsAt of times)
+      results.push(await createHold(db, 'olive', request(olivesPet.id, { startsAt }), now));
+    expect(results.map((r) => r.ok)).toEqual([true, true, true, false]);
+    expect(results[3]).toEqual({ ok: false, error: 'too-many-holds' });
+  });
+});
+
 describe('confirmBooking', () => {
   it('confirms a live hold once, for its owner only', async () => {
     const { db, olivesPet } = await setup();

@@ -31,6 +31,7 @@ export function createAuth(db: Db) {
         session: schema.session,
         account: schema.account,
         verification: schema.verification,
+        rateLimit: schema.rateLimit,
       },
     }),
     secret: process.env.BETTER_AUTH_SECRET,
@@ -39,6 +40,17 @@ export function createAuth(db: Db) {
       host.startsWith('localhost') ? `http://${host}` : `https://${host}`,
     ),
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
+    // Stored in Postgres so limits apply across all serverless instances, not per instance.
+    rateLimit: {
+      enabled: process.env.NODE_ENV === 'production' || process.env.RATE_LIMIT === 'on',
+      storage: 'database',
+      window: 60,
+      max: 100,
+      customRules: {
+        '/sign-in/email': { window: 60, max: 5 },
+        '/sign-up/email': { window: 300, max: 5 },
+      },
+    },
     session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
     user: {
       additionalFields: {
