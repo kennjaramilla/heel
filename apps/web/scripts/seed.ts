@@ -2,6 +2,7 @@
 // Safe to run on every deploy: users are inserted once, profiles are reset to these values.
 import type { TrainerProfileInput } from '@heel/core';
 import { createDb, schema } from '@heel/db';
+import { inArray } from 'drizzle-orm';
 import { hashPassword } from 'better-auth/crypto';
 import { DEMO_PASSWORD } from '../src/lib/demo';
 
@@ -161,6 +162,27 @@ const trainers: SeedTrainer[] = [
   },
 ];
 
+// Weekly hours in each trainer's own time zone: [weekdays, startHour, endHour].
+const hours: Record<string, [number[], number, number][]> = {
+  seed_sam: [
+    [[1, 2, 3, 4, 5], 9, 17],
+    [[6], 10, 13],
+  ],
+  seed_ana: [
+    [[1, 2, 3, 4, 5], 18, 23],
+    [[6], 9, 12],
+  ], // evenings in Manila = mornings in the US
+  seed_priya: [[[1, 2, 3, 4], 10, 18]],
+  seed_marcus: [[[2, 3, 4, 5, 6], 8, 14]],
+  seed_lucia: [[[1, 2, 3, 4, 5], 12, 20]],
+  seed_hannah: [[[1, 3, 5], 9, 17]],
+  seed_kai: [[[1, 2, 3, 4, 5], 15, 21]],
+  seed_beatriz: [
+    [[1, 2, 3, 4, 5], 8, 12],
+    [[1, 2, 3, 4, 5], 14, 18],
+  ],
+};
+
 const owners = [{ id: 'seed_owner', name: 'Riley Morgan', email: 'owner@heel.dev' }];
 
 async function main() {
@@ -201,6 +223,22 @@ async function main() {
       .values({ ...profile, userId: id })
       .onConflictDoUpdate({ target: schema.trainerProfile.userId, set: profile });
   }
+
+  // Reset demo hours on every deploy.
+  const ids = Object.keys(hours);
+  await db.delete(schema.availabilityRule).where(inArray(schema.availabilityRule.trainerId, ids));
+  await db.insert(schema.availabilityRule).values(
+    Object.entries(hours).flatMap(([trainerId, ranges]) =>
+      ranges.flatMap(([days, start, end]) =>
+        days.map((weekday) => ({
+          trainerId,
+          weekday,
+          startMinute: start * 60,
+          endMinute: end * 60,
+        })),
+      ),
+    ),
+  );
 
   await db
     .insert(schema.pet)
