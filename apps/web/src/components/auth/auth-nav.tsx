@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import { Button } from '@/components/ui/button';
 import { authClient } from '@/lib/auth/client';
 
@@ -12,9 +13,12 @@ export function AuthNav() {
 
   if (session) {
     return (
-      <Button asChild>
-        <Link href="/dashboard">Dashboard</Link>
-      </Button>
+      <div className="flex items-center gap-1">
+        <NotificationBell />
+        <Button asChild>
+          <Link href="/dashboard">Dashboard</Link>
+        </Button>
+      </div>
     );
   }
 

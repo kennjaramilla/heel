@@ -15,6 +15,7 @@ const {
   blockedDate,
   supportTicket,
   supportMessage,
+  notification,
 } = schema;
 
 /** Everything we hold about a person, as plain JSON they can download. */
@@ -108,6 +109,7 @@ export async function deleteAccount(
     await tx.delete(blockedDate).where(eq(blockedDate.trainerId, userId));
     await tx.delete(trainerProfile).where(eq(trainerProfile.userId, userId));
     await tx.delete(supportTicket).where(eq(supportTicket.userId, userId));
+    await tx.delete(notification).where(eq(notification.userId, userId));
     await tx
       .update(user)
       .set({

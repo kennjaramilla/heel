@@ -11,6 +11,7 @@ import {
   releaseHold,
 } from '@/server/bookings';
 import { recordAudit } from '@/server/audit';
+import { notifyBookingCancelled, notifyBookingConfirmed } from '@/server/notifications';
 import { getPaymentProvider } from '@/server/payments';
 
 export type HoldState = { message?: string };
@@ -71,6 +72,7 @@ export async function payForBooking(bookingId: string) {
       targetId: bookingId,
       details: { priceCents: confirmed.priceCents, provider: provider.name },
     });
+    await notifyBookingConfirmed(db, bookingId);
   }
   redirect(`/bookings/${bookingId}`);
 }
@@ -109,6 +111,7 @@ export async function cancelBookingAction(
     targetId: bookingId,
     details: { by: user.role, refundCents: result.booking.refundCents },
   });
+  await notifyBookingCancelled(db, bookingId);
   redirect(`/bookings/${bookingId}`);
 }
 

@@ -27,6 +27,13 @@ test('an owner asks for help and an admin replies', async ({ browser }) => {
   await owner.getByRole('button', { name: 'Mark as solved' }).click();
   await expect(owner.getByText('This request is closed.')).toBeVisible();
 
+  await owner.getByRole('link', { name: /Notifications, \d+ unread/ }).click();
+  await expect(owner.getByRole('link', { name: /Heel support replied/ }).first()).toBeVisible();
+  await owner.getByRole('button', { name: 'Mark all as read' }).click();
+  await expect(owner.getByRole('button', { name: 'Mark all as read' })).toBeHidden();
+  await owner.goto('/dashboard');
+  await expect(owner.getByRole('link', { name: 'Notifications', exact: true })).toBeVisible();
+
   await owner.close();
   await admin.close();
 });
