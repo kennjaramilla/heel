@@ -24,8 +24,8 @@ const profile: TrainerProfileInput = {
   species: ['dog'],
   specialties: ['recall'],
   languages: ['English'],
-  price30Cents: 2500,
-  price60Cents: 4500,
+  price30Cents: 250000,
+  price60Cents: 450000,
   published: true,
 };
 
@@ -86,9 +86,9 @@ describe('createHold', () => {
     expect(result.booking).toMatchObject({
       status: 'held',
       petName: 'Mochi',
-      priceCents: 4500,
-      platformFeeCents: 675,
-      trainerPayoutCents: 3825,
+      priceCents: 450000,
+      platformFeeCents: 67500,
+      trainerPayoutCents: 382500,
     });
     expect(result.booking.holdExpiresAt?.toISOString()).toBe('2026-11-01T06:10:00.000Z');
   });
@@ -240,13 +240,13 @@ describe('cancelBooking', () => {
     );
     expect(result.ok && result.booking).toMatchObject({
       status: 'cancelled',
-      refundCents: 4500,
+      refundCents: 450000,
       trainerPayoutCents: 0,
       platformFeeCents: 0,
-      refundRef: 'refund_4500',
+      refundRef: 'refund_450000',
       cancelReason: 'Sick pup',
     });
-    expect(refunds).toEqual([4500]);
+    expect(refunds).toEqual([450000]);
     expect((await createHold(db, 'omar', request(omarsPet.id), now)).ok).toBe(true);
   });
 
@@ -259,14 +259,14 @@ describe('cancelBooking', () => {
       refund,
       late,
     );
-    expect(first.ok && first.booking.refundCents).toBe(2250);
+    expect(first.ok && first.booking.refundCents).toBe(225000);
     expect(
       await cancelBooking(db, { bookingId: id, userId: 'olive', by: 'owner' }, refund, late),
     ).toEqual({
       ok: false,
       error: 'not-cancellable',
     });
-    expect(refunds).toEqual([2250]);
+    expect(refunds).toEqual([225000]);
   });
 
   it('lets the trainer cancel with a full refund, but not strangers or after the start', async () => {
@@ -285,6 +285,6 @@ describe('cancelBooking', () => {
       error: 'already-started',
     });
     const r = await cancelBooking(db, { bookingId: id, userId: 'sam', by: 'trainer' }, refund, now);
-    expect(r.ok && r.booking.refundCents).toBe(4500);
+    expect(r.ok && r.booking.refundCents).toBe(450000);
   });
 });

@@ -10,14 +10,14 @@ const valid = {
   species: ['dog'],
   specialties: ['leash-pulling'],
   languages: ['English'],
-  price30Cents: '2500',
-  price60Cents: '4500',
+  price30Cents: '80000',
+  price60Cents: '150000',
 };
 
 describe('trainerProfileInput', () => {
   it('accepts a complete profile and coerces numbers from form fields', () => {
     const result = trainerProfileInput.parse(valid);
-    expect(result.price60Cents).toBe(4500);
+    expect(result.price60Cents).toBe(150000);
     expect(result.yearsExperience).toBe(10);
     expect(result.published).toBe(false);
   });
@@ -29,13 +29,15 @@ describe('trainerProfileInput', () => {
   });
 
   it('rejects a 60-minute price below the 30-minute price', () => {
-    const r = trainerProfileInput.safeParse({ ...valid, price60Cents: '2000' });
+    const r = trainerProfileInput.safeParse({ ...valid, price60Cents: '50000' });
     expect(r.success).toBe(false);
   });
 
-  it('rejects prices outside $10–$500', () => {
+  it('rejects prices outside ₱300–₱10,000', () => {
     expect(trainerProfileInput.safeParse({ ...valid, price30Cents: '500' }).success).toBe(false);
-    expect(trainerProfileInput.safeParse({ ...valid, price60Cents: '60000' }).success).toBe(false);
+    expect(trainerProfileInput.safeParse({ ...valid, price60Cents: '2000000' }).success).toBe(
+      false,
+    );
   });
 });
 

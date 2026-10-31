@@ -19,8 +19,8 @@ const input: TrainerProfileInput = {
   species: ['dog'],
   specialties: ['leash-pulling'],
   languages: ['English'],
-  price30Cents: 2500,
-  price60Cents: 4500,
+  price30Cents: 250000,
+  price60Cents: 450000,
   published: true,
 };
 
@@ -42,9 +42,9 @@ describe('saveTrainerProfile', () => {
     const created = await saveTrainerProfile(db, users[0]!, input);
     expect(created.slug).toBe('ana-dela-cruz');
 
-    const updated = await saveTrainerProfile(db, users[0]!, { ...input, price60Cents: 5000 });
+    const updated = await saveTrainerProfile(db, users[0]!, { ...input, price60Cents: 500000 });
     expect(updated.slug).toBe('ana-dela-cruz');
-    expect((await getTrainerProfile(db, 't0'))?.price60Cents).toBe(5000);
+    expect((await getTrainerProfile(db, 't0'))?.price60Cents).toBe(500000);
   });
 
   it('adds a number when two trainers share a name', async () => {

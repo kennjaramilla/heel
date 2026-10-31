@@ -26,7 +26,7 @@ export const trainerSearch = z.object({
   species: optional(z.enum(SPECIES)),
   specialty: many(z.enum(SPECIALTY_IDS)).default([]),
   language: optional(z.enum(LANGUAGES)),
-  maxPrice: optional(z.coerce.number().int().min(10).max(500)), // dollars, 60-minute price
+  maxPrice: optional(z.coerce.number().int().min(300).max(10_000)), // pesos, 60-minute price
   sort: z.enum(SORTS).catch('recommended').default('recommended'),
   page: z.coerce.number().int().min(1).max(500).catch(1).default(1),
 });

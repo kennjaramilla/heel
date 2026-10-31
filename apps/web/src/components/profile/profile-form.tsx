@@ -87,7 +87,7 @@ export function ProfileForm({
               id="city"
               name="city"
               defaultValue={profile?.city}
-              placeholder="Austin, TX"
+              placeholder="Makati City"
               required
             />
           </Field>
@@ -96,7 +96,7 @@ export function ProfileForm({
               id="timezone"
               name="timezone"
               ref={timezoneRef}
-              defaultValue={profile?.timezone ?? 'America/New_York'}
+              defaultValue={profile?.timezone ?? 'Asia/Manila'}
               className="h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm"
             >
               {timeZones.map((tz) => (
@@ -139,13 +139,13 @@ export function ProfileForm({
             label="30-minute consult"
             name="price30"
             error={errors.price30Cents}
-            cents={profile?.price30Cents ?? 2500}
+            cents={profile?.price30Cents ?? 80_000}
           />
           <PriceField
             label="60-minute consult"
             name="price60"
             error={errors.price60Cents}
-            cents={profile?.price60Cents ?? 4500}
+            cents={profile?.price60Cents ?? 150_000}
           />
         </div>
         <p className="text-sm text-muted-foreground">
@@ -240,7 +240,7 @@ function PriceField({
     <Field label={label} name={name} error={error}>
       <div className="relative">
         <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
-          $
+          ₱
         </span>
         <Input
           id={name}

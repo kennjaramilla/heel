@@ -2,11 +2,12 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-/* Dark mode follows the OS setting, so shadcn's `dark:` classes use the media query. */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Light only: `dark:` classes apply under a .dark class, which the app never sets. */
+@custom-variant dark (&:is(.dark *));
 
 /* Heel palette, after an agility course: tunnel blue, tennis-ball yellow, toy pink. */
 :root {
+  color-scheme: light;
   --radius: 0.875rem;
   --background: #f5f6fb;
   --foreground: #171a3d;
@@ -34,32 +35,6 @@
   --chart-3: #d23c74;
   --chart-4: #4bb3e0;
   --chart-5: #8b6ee8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #131533;
-    --foreground: #eceeff;
-    --card: #1b1e44;
-    --card-foreground: #eceeff;
-    --popover: #1b1e44;
-    --popover-foreground: #eceeff;
-    --primary: #9da8ff;
-    --primary-foreground: #131533;
-    --secondary: #252a5c;
-    --secondary-foreground: #d5d9ff;
-    --muted: #1d2048;
-    --muted-foreground: #a2a7cf;
-    --accent: #2c3410;
-    --accent-foreground: #e3f58a;
-    --destructive: #ff7a7a;
-    --border: #2a2e5a;
-    --input: #343868;
-    --ring: #9da8ff;
-    --ball: #d4ee3f;
-    --ball-foreground: #171a3d;
-    --pop: #ff8fb6;
-  }
 }
 
 @theme inline {

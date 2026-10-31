@@ -25,8 +25,8 @@ const profile: TrainerProfileInput = {
   species: ['dog'],
   specialties: ['recall'],
   languages: ['English'],
-  price30Cents: 2500,
-  price60Cents: 4500,
+  price30Cents: 250000,
+  price60Cents: 450000,
   published: true,
 };
 const booked = new Date('2026-11-01T06:00:00Z');
@@ -125,9 +125,9 @@ describe('payouts', () => {
     expect(await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-04T17:00:00Z'))).toEqual(
       [],
     );
-    expect(log).toEqual([`${id}:3825`]);
+    expect(log).toEqual([`${id}:382500`]);
     expect(await status()).toMatchObject({ payoutStatus: 'paid', payoutRef: `payout_${id}` });
-    expect(await trainerEarnings(db, 'sam')).toEqual({ pending: 0, paid: 3825, upcoming: 0 });
+    expect(await trainerEarnings(db, 'sam')).toEqual({ pending: 0, paid: 382500, upcoming: 0 });
   });
 
   it('auto-completes consults with no plan after 48 hours', async () => {
@@ -143,6 +143,6 @@ describe('payouts', () => {
     await cancelBooking(db, { bookingId: id, userId: 'olive', by: 'owner' }, async () => 'r', late);
     const log: string[] = [];
     await releaseDuePayouts(db, fakePayout(log), new Date('2026-11-03T06:00:00Z'));
-    expect(log).toEqual([`${id}:1912`]);
+    expect(log).toEqual([`${id}:191250`]);
   });
 });

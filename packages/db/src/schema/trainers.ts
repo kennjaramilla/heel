@@ -41,7 +41,7 @@ export const trainerProfile = pgTable(
   (t) => [
     index('trainer_profile_published_idx').on(t.published),
     // The database enforces money rules too, not just the form.
-    check('trainer_price_30_range', sql`${t.price30Cents} between 1000 and 50000`),
-    check('trainer_price_60_range', sql`${t.price60Cents} between 1000 and 50000`),
+    check('trainer_price_30_range', sql`${t.price30Cents} between 30000 and 1000000`),
+    check('trainer_price_60_range', sql`${t.price60Cents} between 30000 and 1000000`),
   ],
 );

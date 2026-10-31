@@ -1,4 +1,4 @@
-// Money is always integer cents; never floats.
+// Money is always integer centavos (named cents); never floats.
 export type Cents = number;
 
 export function assertCents(value: number): asserts value is Cents {
@@ -20,8 +20,8 @@ export function splitPayment(
   return { platformFee, trainerPayout: amount - platformFee };
 }
 
-/** Formats cents as currency; whole amounts drop the ".00" ($45, $45.50). */
-export function formatCents(amount: Cents, currency = 'USD', locale = 'en-US'): string {
+/** Formats centavos as pesos; whole amounts drop the ".00" (₱800, ₱800.50). */
+export function formatCents(amount: Cents, currency = 'PHP', locale = 'en-PH'): string {
   assertCents(amount);
   const whole = amount % 100 === 0;
   return new Intl.NumberFormat(locale, {

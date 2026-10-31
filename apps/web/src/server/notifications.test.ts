@@ -27,8 +27,8 @@ const profile: TrainerProfileInput = {
   species: ['dog'],
   specialties: ['recall'],
   languages: ['English'],
-  price30Cents: 2500,
-  price60Cents: 4500,
+  price30Cents: 250000,
+  price60Cents: 450000,
   published: true,
 };
 const now = new Date('2026-11-01T06:00:00Z');
@@ -96,7 +96,7 @@ describe('notifications', () => {
     await cancelBooking(db, { bookingId, userId: sam, by: 'trainer' }, async () => 'refund', now);
     await notifyBookingCancelled(db, bookingId);
     const [n] = await listNotifications(db, olive);
-    expect(n?.body).toBe("Sam cancelled Mochi's consult. $45 is on its way back to your card.");
+    expect(n?.body).toBe("Sam cancelled Mochi's consult. ₱4,500 is on its way back to your card.");
     expect(await titles(db, sam)).toEqual([]);
   });
 

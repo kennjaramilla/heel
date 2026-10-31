@@ -1,14 +1,14 @@
 import { z } from 'zod';
 import { LANGUAGES, SPECIALTY_IDS, SPECIES } from './catalog';
 
-const MIN_PRICE = 1000; // $10
-const MAX_PRICE = 50000; // $500
+const MIN_PRICE = 30_000; // ₱300
+const MAX_PRICE = 1_000_000; // ₱10,000
 
 const price = z.coerce
   .number()
   .int('Use whole cents')
-  .min(MIN_PRICE, 'At least $10')
-  .max(MAX_PRICE, 'At most $500');
+  .min(MIN_PRICE, 'At least ₱300')
+  .max(MAX_PRICE, 'At most ₱10,000');
 
 export const trainerProfileInput = z
   .object({

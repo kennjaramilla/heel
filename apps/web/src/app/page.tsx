@@ -100,7 +100,7 @@ export default function Home() {
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Book a certified trainer for the leash pulling, the barking at the door, or the puppy
-              who won&apos;t settle. Consults from {formatCents(2500)}.
+              who won&apos;t settle. Consults from {formatCents(70_000)}.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" asChild>
