@@ -22,6 +22,13 @@
       "when": 1793428614495,
       "tag": "0002_pets",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793429344319,
+      "tag": "0003_availability",
+      "breakpoints": true
     }
   ]
 }
