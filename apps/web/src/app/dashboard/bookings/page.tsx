@@ -74,7 +74,9 @@ function BookingList({ bookings, role }: { bookings: BookingView[]; role: 'owner
             </div>
             <div className="flex items-center gap-3">
               <span className="text-sm">
-                {formatCents(role === 'owner' ? b.priceCents : b.trainerPayoutCents)}
+                {b.status === 'cancelled' && role === 'owner' && b.refundCents > 0
+                  ? `Refunded ${formatCents(b.refundCents)}`
+                  : formatCents(role === 'owner' ? b.priceCents : b.trainerPayoutCents)}
               </span>
               <Badge
                 variant={b.status === 'confirmed' ? 'default' : 'secondary'}

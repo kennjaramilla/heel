@@ -3,7 +3,13 @@
 import { bookingRequest } from '@heel/core';
 import { redirect } from 'next/navigation';
 import { getDb, getSession, requireUser } from '@/lib/auth/server';
-import { confirmBooking, createHold, getBookingForUser } from '@/server/bookings';
+import {
+  cancelBooking,
+  confirmBooking,
+  createHold,
+  getBookingForUser,
+  releaseHold,
+} from '@/server/bookings';
 import { getPaymentProvider } from '@/server/payments';
 
 export type HoldState = { message?: string };
@@ -56,4 +62,41 @@ export async function payForBooking(bookingId: string) {
     paymentRef: checkout.paymentRef,
   });
   redirect(`/bookings/${bookingId}`);
+}
+
+export type CancelState = { message?: string };
+
+const cancelErrors = {
+  'not-found': 'That booking could not be found.',
+  'already-started': 'This consult has already started, so it can no longer be cancelled.',
+  'not-cancellable': 'This booking is no longer active.',
+} as const;
+
+export async function cancelBookingAction(
+  _prev: CancelState,
+  form: FormData,
+): Promise<CancelState> {
+  const user = await requireUser(['owner', 'trainer']);
+  const bookingId = String(form.get('bookingId') ?? '');
+  const provider = getPaymentProvider();
+  const result = await cancelBooking(
+    getDb(),
+    {
+      bookingId,
+      userId: user.id,
+      by: user.role as 'owner' | 'trainer',
+      reason: String(form.get('reason') ?? ''),
+    },
+    (booking, cents) => provider.refund(booking, cents),
+  );
+  if (!result.ok) return { message: cancelErrors[result.error] };
+  redirect(`/bookings/${bookingId}`);
+}
+
+export async function releaseHoldAction(bookingId: string) {
+  const owner = await requireUser(['owner']);
+  const db = getDb();
+  const booking = await getBookingForUser(db, owner.id, bookingId);
+  await releaseHold(db, owner.id, bookingId);
+  redirect(booking?.trainerSlug ? `/trainers/${booking.trainerSlug}` : '/dashboard/bookings');
 }
