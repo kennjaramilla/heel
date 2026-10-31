@@ -5,63 +5,65 @@
 /* Dark mode follows the OS setting, so shadcn's `dark:` classes use the media query. */
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
-/* Heel palette: trusted green, warm cream, a playful amber and peach. */
+/* Heel palette, after an agility course: tunnel blue, tennis-ball yellow, toy pink. */
 :root {
   --radius: 0.875rem;
-  --background: #fbf7f0;
-  --foreground: #1d2522;
+  --background: #f5f6fb;
+  --foreground: #171a3d;
   --card: #ffffff;
-  --card-foreground: #1d2522;
+  --card-foreground: #171a3d;
   --popover: #ffffff;
-  --popover-foreground: #1d2522;
-  --primary: #1f6f5c;
-  --primary-foreground: #fbf7f0;
-  --secondary: #e4eee8;
-  --secondary-foreground: #1f4a3e;
-  --muted: #f3ede3;
-  --muted-foreground: #5f6b66;
-  --accent: #fde8d0;
-  --accent-foreground: #7a4310;
-  --destructive: #c8402f;
-  --border: #e8e0d3;
-  --input: #ddd3c4;
-  --ring: #1f6f5c;
-  --amber: #e8a33d;
-  --peach: #f6b896;
-  --chart-1: #1f6f5c;
-  --chart-2: #e8a33d;
-  --chart-3: #f08a6c;
-  --chart-4: #6aa5c9;
-  --chart-5: #9b7ad8;
+  --popover-foreground: #171a3d;
+  --primary: #2e3fbf;
+  --primary-foreground: #ffffff;
+  --secondary: #e6e9ff;
+  --secondary-foreground: #1f2a8a;
+  --muted: #eceef8;
+  --muted-foreground: #565b80;
+  --accent: #f1fac4;
+  --accent-foreground: #3e4a00;
+  --destructive: #cc3340;
+  --border: #dfe2f1;
+  --input: #d0d4ea;
+  --ring: #2e3fbf;
+  --ball: #d4ee3f;
+  --ball-foreground: #171a3d;
+  --pop: #d23c74;
+  --chart-1: #2e3fbf;
+  --chart-2: #d4ee3f;
+  --chart-3: #d23c74;
+  --chart-4: #4bb3e0;
+  --chart-5: #8b6ee8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #111614;
-    --foreground: #eef2ef;
-    --card: #18201d;
-    --card-foreground: #eef2ef;
-    --popover: #18201d;
-    --popover-foreground: #eef2ef;
-    --primary: #5cc0a5;
-    --primary-foreground: #0c1311;
-    --secondary: #1f2b27;
-    --secondary-foreground: #cfe5dc;
-    --muted: #1c2421;
-    --muted-foreground: #9aa6a1;
-    --accent: #3a2a17;
-    --accent-foreground: #f6c88d;
-    --destructive: #f07a68;
-    --border: #26302c;
-    --input: #2f3a35;
-    --ring: #5cc0a5;
-    --amber: #f0b65c;
-    --peach: #e59a78;
+    --background: #131533;
+    --foreground: #eceeff;
+    --card: #1b1e44;
+    --card-foreground: #eceeff;
+    --popover: #1b1e44;
+    --popover-foreground: #eceeff;
+    --primary: #9da8ff;
+    --primary-foreground: #131533;
+    --secondary: #252a5c;
+    --secondary-foreground: #d5d9ff;
+    --muted: #1d2048;
+    --muted-foreground: #a2a7cf;
+    --accent: #2c3410;
+    --accent-foreground: #e3f58a;
+    --destructive: #ff7a7a;
+    --border: #2a2e5a;
+    --input: #343868;
+    --ring: #9da8ff;
+    --ball: #d4ee3f;
+    --ball-foreground: #171a3d;
+    --pop: #ff8fb6;
   }
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-figtree);
   --font-heading: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
@@ -82,8 +84,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-amber: var(--amber);
-  --color-peach: var(--peach);
+  --color-ball: var(--ball);
+  --color-ball-foreground: var(--ball-foreground);
+  --color-pop: var(--pop);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
