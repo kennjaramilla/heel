@@ -15,6 +15,8 @@ import {
   Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
 import {
   Accordion,
   AccordionContent,
@@ -24,15 +26,9 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { sampleTrainers, type SampleTrainer } from '@/lib/sample-trainers';
-
-const toneClasses: Record<SampleTrainer['tone'], string> = {
-  green: 'bg-secondary text-secondary-foreground',
-  amber: 'bg-accent text-accent-foreground',
-  peach: 'bg-peach/30 text-foreground',
-};
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { TrainerCard } from '@/components/trainers/trainer-card';
+import { getCachedTrainers } from '@/server/cached';
 
 const specialties = [
   { icon: Dog, label: 'Puppy basics', body: 'Potty training, biting, sleeping through the night.' },
@@ -111,7 +107,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" asChild>
-                <Link href="#trainers">Find a trainer</Link>
+                <Link href="/trainers">Find a trainer</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href="#how-it-works">How it works</Link>
@@ -162,13 +158,14 @@ export default function Home() {
             title="Meet a few of our trainers"
             body="Every trainer sets their own hours and price. Times always show in your time zone."
           />
-          <ul className="mt-10 grid gap-5 md:grid-cols-3">
-            {sampleTrainers.map((t) => (
-              <li key={t.name}>
-                <TrainerCard trainer={t} />
-              </li>
-            ))}
-          </ul>
+          <Suspense fallback={<TrainerGridSkeleton />}>
+            <FeaturedTrainers />
+          </Suspense>
+          <div className="mt-8">
+            <Button variant="outline" size="lg" asChild>
+              <Link href="/trainers">See all trainers</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -256,52 +253,6 @@ function SectionHeading({
   );
 }
 
-function TrainerCard({ trainer }: { trainer: SampleTrainer }) {
-  return (
-    <Card className="h-full">
-      <CardHeader className="flex items-center gap-3">
-        <Avatar size="lg" className="size-12">
-          <AvatarFallback className={cn('font-heading font-semibold', toneClasses[trainer.tone])}>
-            {trainer.initials}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <p className="font-heading text-base font-semibold">{trainer.name}</p>
-          <p className="truncate text-sm text-muted-foreground">
-            {trainer.credential} · {trainer.city}
-          </p>
-        </div>
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-3">
-        <div className="flex flex-wrap gap-1.5">
-          {trainer.specialties.map((s) => (
-            <Badge key={s} variant="outline">
-              {s}
-            </Badge>
-          ))}
-        </div>
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          {trainer.species.includes('dog') && <Dog className="size-4" aria-label="Dogs" />}
-          {trainer.species.includes('cat') && <Cat className="size-4" aria-label="Cats" />}
-          Next available:{' '}
-          <span className="font-medium text-foreground">{trainer.nextAvailable}</span>
-        </p>
-      </CardContent>
-      <CardFooter className="justify-between border-t bg-muted/40 py-3">
-        <span className="text-sm">
-          <span className="font-heading text-lg font-semibold">
-            {formatCents(trainer.priceCents)}
-          </span>{' '}
-          <span className="text-muted-foreground">/ 60 min</span>
-        </span>
-        <Button size="sm" asChild>
-          <Link href="#trainers">View times</Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
-
 function BookingPreview() {
   return (
     <div className="relative mx-auto w-full max-w-md" aria-label="Example booking">
@@ -341,5 +292,29 @@ function BookingPreview() {
         <span className="text-sm font-medium">Training plan sent</span>
       </div>
     </div>
+  );
+}
+
+async function FeaturedTrainers() {
+  await connection(); // the landing page shell stays static; trainers stream in at request time
+  const trainers = await getCachedTrainers(3);
+  return (
+    <ul className="mt-10 grid gap-5 md:grid-cols-3">
+      {trainers.map((t) => (
+        <li key={t.userId}>
+          <TrainerCard trainer={t} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function TrainerGridSkeleton() {
+  return (
+    <ul className="mt-10 grid gap-5 md:grid-cols-3" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <li key={i} className="h-64 animate-pulse rounded-xl bg-card ring-1 ring-foreground/10" />
+      ))}
+    </ul>
   );
 }
