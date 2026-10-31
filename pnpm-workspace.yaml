@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Supply chain: skip versions published less than 3 days ago.
+minimumReleaseAge: 4320
+
+# Install scripts are blocked unless listed here.
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - unrs-resolver
