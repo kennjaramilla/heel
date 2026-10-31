@@ -1,3 +1,5 @@
 pnpm-lock.yaml
 .next
 .turbo
+test-results
+playwright-report
