@@ -85,7 +85,7 @@ export async function releaseDuePayouts(
         inArray(booking.status, ['completed', 'cancelled']),
       ),
     );
-  let paid = 0;
+  const paid: string[] = [];
   for (const b of due) {
     const payoutRef = await payout(b);
     const rows = await db
@@ -93,7 +93,7 @@ export async function releaseDuePayouts(
       .set({ payoutStatus: 'paid', payoutRef })
       .where(and(eq(booking.id, b.id), eq(booking.payoutStatus, 'pending')))
       .returning({ id: booking.id });
-    paid += rows.length;
+    if (rows.length) paid.push(b.id);
   }
   return paid;
 }
