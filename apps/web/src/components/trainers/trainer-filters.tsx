@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-const PRICE_OPTIONS = [30, 40, 50, 75];
+const PRICE_OPTIONS = [1000, 1500, 2000, 3000];
 const SORT_LABELS: Record<TrainerSearch['sort'], string> = {
   recommended: 'Recommended',
   'price-asc': 'Price: low to high',
@@ -126,7 +126,7 @@ export function TrainerFilters({ search }: { search: TrainerSearch }) {
           <option value="">Any price</option>
           {PRICE_OPTIONS.map((p) => (
             <option key={p} value={p}>
-              Up to ${p}
+              Up to ₱{p.toLocaleString('en-PH')}
             </option>
           ))}
         </Select>

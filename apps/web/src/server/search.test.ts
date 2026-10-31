@@ -14,23 +14,23 @@ const base: TrainerProfileInput = {
   species: ['dog'],
   specialties: ['recall'],
   languages: ['English'],
-  price30Cents: 2000,
-  price60Cents: 4000,
+  price30Cents: 200000,
+  price60Cents: 400000,
   published: true,
 };
 
 const fixtures: [string, Partial<TrainerProfileInput>][] = [
   [
     'Alex Cat',
-    { species: ['cat'], specialties: ['cat-behaviour'], price60Cents: 3000, yearsExperience: 3 },
+    { species: ['cat'], specialties: ['cat-behaviour'], price60Cents: 300000, yearsExperience: 3 },
   ],
   [
     'Bea Both',
     {
       species: ['dog', 'cat'],
       specialties: ['reactivity'],
-      languages: ['English', 'Spanish'],
-      price60Cents: 6000,
+      languages: ['English', 'Cebuano'],
+      price60Cents: 600000,
       yearsExperience: 12,
     },
   ],
@@ -38,7 +38,7 @@ const fixtures: [string, Partial<TrainerProfileInput>][] = [
     'Cy Dog',
     {
       specialties: ['leash-pulling', 'recall'],
-      price60Cents: 4500,
+      price60Cents: 450000,
       yearsExperience: 8,
       headline: '100% calm walks',
     },
@@ -72,9 +72,9 @@ describe('searchTrainers', () => {
       'Bea Both',
       'Alex Cat',
     ]);
-    expect(await names({ language: 'Spanish' })).toEqual(['Bea Both']);
-    expect(await names({ maxPrice: '45' })).toEqual(['Cy Dog', 'Alex Cat']);
-    expect(await names({ species: 'dog', maxPrice: '45' })).toEqual(['Cy Dog']);
+    expect(await names({ language: 'Cebuano' })).toEqual(['Bea Both']);
+    expect(await names({ maxPrice: '4500' })).toEqual(['Cy Dog', 'Alex Cat']);
+    expect(await names({ species: 'dog', maxPrice: '4500' })).toEqual(['Cy Dog']);
   });
 
   it('searches names and headlines, treating % and _ as plain text', async () => {

@@ -27,8 +27,8 @@ const profile: TrainerProfileInput = {
   species: ['dog'],
   specialties: ['recall'],
   languages: ['English'],
-  price30Cents: 2500,
-  price60Cents: 4500,
+  price30Cents: 250000,
+  price60Cents: 450000,
   published: true,
 };
 

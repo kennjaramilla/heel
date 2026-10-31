@@ -12,7 +12,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'retain-on-failure',
-    timezoneId: 'America/New_York',
+    timezoneId: 'Asia/Manila',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

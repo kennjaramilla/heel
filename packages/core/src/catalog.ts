@@ -21,11 +21,11 @@ export function specialtyLabel(id: string) {
 
 export const LANGUAGES = [
   'English',
-  'Spanish',
   'Filipino',
-  'French',
-  'German',
-  'Portuguese',
+  'Cebuano',
+  'Ilocano',
+  'Hiligaynon',
+  'Kapampangan',
 ] as const;
 
 export const CONSULT_LENGTHS = [30, 60] as const;

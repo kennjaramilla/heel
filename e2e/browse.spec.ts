@@ -13,9 +13,9 @@ test('a visitor can find a cat trainer and see their open times', async ({ page 
   await expect(page).toHaveURL(/specialty=litter-box/);
   await expect(page.getByText('1 trainer', { exact: true })).toBeVisible();
 
-  await page.getByRole('link', { name: 'Priya Shah' }).click();
-  await expect(page.getByRole('heading', { name: 'Priya Shah' })).toBeVisible();
-  await expect(page.getByText('Times in America/New York')).toBeVisible();
+  await page.getByRole('link', { name: 'Pia Mendoza' }).click();
+  await expect(page.getByRole('heading', { name: 'Pia Mendoza' })).toBeVisible();
+  await expect(page.getByText('Times in Asia/Manila')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Sign in to book' })).toBeVisible();
 });
 
@@ -24,7 +24,7 @@ test('bad search links still work', async ({ page }) => {
   await expect(page.getByText('8 trainers')).toBeVisible();
 });
 
-for (const path of ['/', '/trainers', '/trainers/sam-rivera', '/sign-in', '/sign-up']) {
+for (const path of ['/', '/trainers', '/trainers/sam-villanueva', '/sign-in', '/sign-up']) {
   test(`no serious accessibility issues on ${path}`, async ({ page }) => {
     await page.goto(path);
     await page.waitForLoadState('networkidle');
