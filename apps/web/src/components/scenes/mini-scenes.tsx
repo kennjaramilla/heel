@@ -4,8 +4,8 @@ import { s } from './classes';
 function Frame({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <svg viewBox="0 0 240 160" role="img" aria-label={label} className={`${s.scene} w-full`}>
-      <rect width="240" height="160" fill="#fdf3e4" />
-      <path d="M0 128 C 80 120, 160 134, 240 124 L 240 160 L 0 160 Z" fill="#cfe3d6" />
+      <rect width="240" height="160" fill="#eef1ff" />
+      <path d="M0 128 C 80 120, 160 134, 240 124 L 240 160 L 0 160 Z" fill="#cfe8b0" />
       {children}
     </svg>
   );
@@ -14,7 +14,7 @@ function Frame({ label, children }: { label: string; children: React.ReactNode }
 export function LeashWalk() {
   return (
     <Frame label="Illustration: a dog trots calmly on a loose leash">
-      <g className={s.ground} fill="#8fbf9f">
+      <g className={s.ground} fill="#9cc76f">
         {Array.from({ length: 9 }, (_, i) => (
           <path key={i} d={`M${i * 60 + 10} 140 l 4 -8 l 4 8 M${i * 60 + 40} 150 l 3 -6 l 3 6`} />
         ))}
@@ -22,7 +22,7 @@ export function LeashWalk() {
       <g className={s.bob}>
         <path
           d="M30 10 C 60 70, 100 70, 136 76"
-          stroke="#1f6f5c"
+          stroke="#2e3fbf"
           strokeWidth={3}
           fill="none"
           strokeLinecap="round"
@@ -63,7 +63,7 @@ export function CatTarget() {
           fill="none"
           strokeLinecap="round"
         />
-        <path d="M138 44 l -8 18 l 14 -10 l 2 18 l 6 -22 z" fill="#f08a6c" />
+        <path d="M138 44 l -8 18 l 14 -10 l 2 18 l 6 -22 z" fill="#ff6f9c" />
         <circle cx="140" cy="46" r="3" fill="#e8a33d" />
       </g>
       <g transform="translate(78 54)">

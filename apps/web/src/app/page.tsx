@@ -88,15 +88,15 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-32 -right-32 size-[28rem] rounded-full bg-accent/70 blur-3xl"
+          className="pointer-events-none absolute -top-32 -right-32 size-[28rem] rounded-full bg-secondary blur-3xl"
         />
         <div className="relative mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 md:py-24 lg:grid-cols-[1.1fr_1fr]">
           <div>
-            <Badge variant="secondary" className="h-7 px-3 text-sm">
+            <Badge className="h-7 bg-ball px-3 text-sm text-ball-foreground">
               <Video aria-hidden="true" /> 1:1 video consults
             </Badge>
             <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance sm:text-6xl">
-              Expert help for your pet, <span className="text-primary">from home.</span>
+              Expert help for your pet, from home.
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Book a certified trainer for the leash pulling, the barking at the door, or the puppy
@@ -176,7 +176,7 @@ export default function Home() {
           {steps.map(({ icon: Icon, title, body }, i) => (
             <li key={title} className="relative rounded-2xl border border-border bg-card p-6">
               <span className="font-heading text-sm font-semibold text-primary">Step {i + 1}</span>
-              <Icon className="mt-3 size-6 text-amber" aria-hidden="true" />
+              <Icon className="mt-3 size-6 text-pop" aria-hidden="true" />
               <h3 className="mt-3 text-lg font-semibold">{title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{body}</p>
             </li>
@@ -187,7 +187,7 @@ export default function Home() {
       <section id="for-trainers" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
         <div className="grid gap-8 overflow-hidden rounded-3xl bg-primary p-8 text-primary-foreground md:grid-cols-[1.2fr_1fr] md:p-12">
           <div>
-            <p className="font-heading text-sm font-semibold tracking-wide uppercase opacity-95">
+            <p className="w-fit rounded-full bg-ball px-3 py-1 font-heading text-sm font-semibold text-ball-foreground">
               For trainers
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance">
@@ -245,9 +245,7 @@ function SectionHeading({
 }) {
   return (
     <div className="max-w-2xl">
-      <p className="font-heading text-sm font-semibold tracking-wide text-primary uppercase">
-        {eyebrow}
-      </p>
+      <p className="font-heading text-sm font-semibold text-primary">{eyebrow}</p>
       <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl">{title}</h2>
       {body && <p className="mt-3 text-muted-foreground">{body}</p>}
     </div>
@@ -271,7 +269,7 @@ function HeroScene() {
       <div
         className={`${scenes.float} ${scenes.floatLate} absolute -bottom-5 left-4 flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 shadow-lg sm:-left-8`}
       >
-        <ClipboardList className="size-5 text-amber" aria-hidden="true" />
+        <ClipboardList className="size-5 text-pop" aria-hidden="true" />
         <span className="text-sm font-medium">Training plan sent</span>
       </div>
     </div>
