@@ -42,7 +42,10 @@ export function createAuth(db: Db) {
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
     // Stored in Postgres so limits apply across all serverless instances, not per instance.
     rateLimit: {
-      enabled: process.env.NODE_ENV === 'production' || process.env.RATE_LIMIT === 'on',
+      // On in production; RATE_LIMIT=off lets the end-to-end suite sign in many times from one machine.
+      enabled:
+        process.env.RATE_LIMIT === 'on' ||
+        (process.env.NODE_ENV === 'production' && process.env.RATE_LIMIT !== 'off'),
       storage: 'database',
       window: 60,
       max: 100,
