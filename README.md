@@ -8,9 +8,11 @@ Heel is a two-sided marketplace: pet owners find trainers, book paid sessions, a
 
 - **Web:** Next.js (App Router) + TypeScript + Tailwind, deployed on Vercel
 - **Business rules:** `packages/core`, plain TypeScript shared by the web app and, later, the mobile app
+- **Data:** Postgres (Neon) + Drizzle; locally an embedded PGlite database, so no setup is needed
+- **Auth:** Better Auth with email and password; roles are pet owner, trainer and admin
 - **Tooling:** pnpm workspaces + Turborepo, ESLint, Prettier, Vitest, GitHub Actions
 
-Coming in later PRs: Postgres (Neon) + Drizzle, Better Auth, Stripe Connect, Daily video, Inngest reminders, and an Expo mobile app.
+Coming in later PRs: Stripe Connect, Daily video, Inngest reminders, and an Expo mobile app.
 
 ## Run it locally
 
@@ -19,6 +21,7 @@ Requires Node 22.
 ```bash
 corepack enable   # or: npm i -g pnpm
 pnpm install
+pnpm db:migrate   # creates the local database in .data/
 pnpm dev          # http://localhost:3000
 ```
 
@@ -29,4 +32,5 @@ Other scripts: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm f
 ```
 apps/web         Next.js app
 packages/core    Business rules (money, scheduling, refunds), unit tested
+packages/db      Drizzle schema, migrations, and a test helper that spins up Postgres in memory
 ```

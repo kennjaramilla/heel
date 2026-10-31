@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AuthNav } from '@/components/auth/auth-nav';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 
@@ -20,9 +21,7 @@ export function SiteHeader() {
             </Button>
           ))}
         </nav>
-        <Button asChild>
-          <Link href="/#trainers">Book a consult</Link>
-        </Button>
+        <AuthNav />
       </div>
     </header>
   );
