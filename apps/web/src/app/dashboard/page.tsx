@@ -14,7 +14,9 @@ import { Suspense } from 'react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { requireUser } from '@/lib/auth/server';
+import { getDb, requireUser } from '@/lib/auth/server';
+import { trainerEarnings } from '@/server/completion';
+import { formatCents } from '@heel/core';
 
 export const metadata: Metadata = { title: 'Dashboard' };
 
@@ -97,6 +99,7 @@ async function Dashboard() {
         </div>
         <SignOutButton />
       </div>
+      {user.role === 'trainer' && <Earnings trainerId={user.id} />}
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {nextSteps[user.role].map(({ icon: Icon, title, body, href }) => (
           <li key={title} className="relative">
@@ -118,5 +121,25 @@ async function Dashboard() {
         ))}
       </ul>
     </>
+  );
+}
+
+async function Earnings({ trainerId }: { trainerId: string }) {
+  const earnings = await trainerEarnings(getDb(), trainerId);
+  const items = [
+    { label: 'Upcoming consults', value: earnings.upcoming, hint: 'Confirmed consults' },
+    { label: 'Pending payout', value: earnings.pending, hint: 'Paid out 24h after each consult' },
+    { label: 'Paid out', value: earnings.paid, hint: 'All time' },
+  ];
+  return (
+    <section aria-label="Earnings" className="mt-8 grid gap-4 sm:grid-cols-3">
+      {items.map((i) => (
+        <div key={i.label} className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-sm text-muted-foreground">{i.label}</p>
+          <p className="mt-1 font-heading text-2xl font-bold">{formatCents(i.value)}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{i.hint}</p>
+        </div>
+      ))}
+    </section>
   );
 }

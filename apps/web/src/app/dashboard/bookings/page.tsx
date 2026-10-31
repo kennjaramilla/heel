@@ -84,6 +84,11 @@ function BookingList({ bookings, role }: { bookings: BookingView[]; role: 'owner
               >
                 {b.status === 'held' ? 'Awaiting payment' : b.status}
               </Badge>
+              {role === 'trainer' && b.payoutStatus !== 'not_due' && (
+                <Badge variant="outline">
+                  {b.payoutStatus === 'paid' ? 'Paid out' : 'Payout pending'}
+                </Badge>
+              )}
             </div>
           </Link>
         </li>

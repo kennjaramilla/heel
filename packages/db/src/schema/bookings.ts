@@ -13,6 +13,7 @@ export const bookingStatus = pgEnum('booking_status', [
 export type BookingStatus = (typeof bookingStatus.enumValues)[number];
 
 export const cancelledBy = pgEnum('cancelled_by', ['owner', 'trainer', 'admin']);
+export const payoutStatus = pgEnum('payout_status', ['not_due', 'pending', 'paid']);
 
 export const booking = pgTable(
   'booking',
@@ -43,6 +44,11 @@ export const booking = pgTable(
     cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
     cancelledBy: cancelledBy('cancelled_by'),
     cancelReason: text('cancel_reason'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    // The trainer is paid PAYOUT_HOLD_HOURS after completion, by the daily payouts job.
+    payoutStatus: payoutStatus('payout_status').notNull().default('not_due'),
+    payoutDueAt: timestamp('payout_due_at', { withTimezone: true }),
+    payoutRef: text('payout_ref'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -60,3 +66,16 @@ export const booking = pgTable(
     // No-overlap rules are exclusion constraints, added in a hand-written migration (0005).
   ],
 );
+
+export const trainingPlan = pgTable('training_plan', {
+  bookingId: text('booking_id')
+    .primaryKey()
+    .references(() => booking.id, { onDelete: 'cascade' }),
+  summary: text('summary').notNull(),
+  steps: text('steps').array().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});

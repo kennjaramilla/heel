@@ -11,6 +11,8 @@ export interface PaymentProvider {
   startCheckout(booking: Booking): Promise<CheckoutResult>;
   /** Returns the provider's refund reference. */
   refund(booking: Booking, amountCents: number): Promise<string>;
+  /** Sends the trainer their share. Must be idempotent per booking. */
+  payout(booking: Booking): Promise<string>;
 }
 
 /** Marks the booking as paid straight away. Used until a real provider is configured. */
@@ -22,6 +24,9 @@ export const demoPayments: PaymentProvider = {
   },
   async refund(booking, amountCents) {
     return `demo_refund_${booking.id.slice(0, 8)}_${amountCents}`;
+  },
+  async payout(booking) {
+    return `demo_payout_${booking.id.slice(0, 8)}`;
   },
 };
 

@@ -5,6 +5,7 @@ import {
   generateSlots,
   HOLD_MINUTES,
   type Interval,
+  payoutDueAt,
   priceFor,
   refundFor,
 } from '@heel/core';
@@ -269,6 +270,10 @@ export async function cancelBooking(
       refundCents: decision.refundCents,
       platformFeeCents: decision.platformKeepsCents,
       trainerPayoutCents: decision.trainerKeepsCents,
+      // A late cancellation still pays the trainer their share.
+      ...(decision.trainerKeepsCents > 0
+        ? { payoutStatus: 'pending' as const, payoutDueAt: payoutDueAt(now) }
+        : {}),
     })
     .where(
       and(eq(booking.id, current.id), eq(booking.status, 'confirmed'), gt(booking.startsAt, now)),

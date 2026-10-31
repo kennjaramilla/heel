@@ -1,5 +1,14 @@
 import { formatCents, refundFor } from '@heel/core';
-import { Ban, CalendarCheck, CircleAlert, Clock, Dog, PartyPopper, Video } from 'lucide-react';
+import {
+  Ban,
+  CalendarCheck,
+  CircleAlert,
+  ClipboardList,
+  Clock,
+  Dog,
+  PartyPopper,
+  Video,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -7,6 +16,7 @@ import { Suspense } from 'react';
 import { CancelPanel } from '@/components/bookings/cancel-panel';
 import { HoldCountdown } from '@/components/bookings/hold-countdown';
 import { PayButton } from '@/components/bookings/pay-button';
+import { PlanForm } from '@/components/bookings/plan-form';
 import { ReleaseHoldButton } from '@/components/bookings/release-hold-button';
 import { LocalTime } from '@/components/local-time';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getDb, requireUser } from '@/lib/auth/server';
 import { type BookingView, getBookingForUser } from '@/server/bookings';
+import { getTrainingPlan } from '@/server/completion';
 import { getPaymentProvider } from '@/server/payments';
 
 export const metadata: Metadata = { title: 'Your booking' };
@@ -30,8 +41,10 @@ export default function BookingPage({ params }: PageProps<'/bookings/[id]'>) {
 
 async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>['params'] }) {
   const user = await requireUser();
-  const booking = await getBookingForUser(getDb(), user.id, (await params).id);
+  const db = getDb();
+  const booking = await getBookingForUser(db, user.id, (await params).id);
   if (!booking) notFound();
+  const plan = await getTrainingPlan(db, booking.id);
 
   const isOwner = booking.ownerId === user.id;
   const now = new Date();
@@ -108,6 +121,51 @@ async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>[
       {booking.status === 'confirmed' && booking.startsAt > now && (
         <Cancel booking={booking} isOwner={isOwner} now={now} />
       )}
+
+      {(booking.status === 'confirmed' || booking.status === 'completed') &&
+        booking.endsAt <= now && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                <ClipboardList className="size-5 text-amber" aria-hidden="true" />
+                {booking.petName}&apos;s training plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              {!isOwner ? (
+                <>
+                  {!plan && (
+                    <p className="text-sm text-muted-foreground">
+                      Sending the plan completes the consult. Your payout of{' '}
+                      {formatCents(booking.trainerPayoutCents)} is released 24 hours later.
+                    </p>
+                  )}
+                  <PlanForm
+                    bookingId={booking.id}
+                    petName={booking.petName}
+                    initial={plan ?? undefined}
+                  />
+                </>
+              ) : plan ? (
+                <>
+                  <p className="whitespace-pre-line text-sm">{plan.summary}</p>
+                  <ol className="grid gap-2">
+                    {plan.steps.map((step, i) => (
+                      <li key={i} className="flex gap-3 rounded-xl bg-muted p-3 text-sm">
+                        <span className="font-heading font-semibold text-primary">{i + 1}</span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {booking.trainerName} will send {booking.petName}&apos;s plan here soon.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" asChild>
