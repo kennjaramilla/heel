@@ -1,14 +1,17 @@
-import { formatCents, specialtyLabel } from '@heel/core';
+import { formatCents, generateSlots, specialtyLabel } from '@heel/core';
 import { Award, Cat, Clock, Dog, Languages, MapPin } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 import { Suspense } from 'react';
+import { OpenTimes } from '@/components/availability/open-times';
 import { TrainerAvatar } from '@/components/trainers/trainer-avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCachedTrainer } from '@/server/cached';
+import { getCachedAvailability, getCachedTrainer } from '@/server/cached';
+import type { PublicTrainer } from '@/server/trainers';
 
 export async function generateMetadata({
   params,
@@ -100,6 +103,12 @@ async function Trainer({ params }: { params: PageProps<'/trainers/[slug]'>['para
               <span className="font-heading text-lg font-semibold">{formatCents(o.cents)}</span>
             </div>
           ))}
+          <div className="mt-2">
+            <p className="mb-3 text-sm font-medium">Next open times (60 min)</p>
+            <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-muted" />}>
+              <TrainerOpenTimes trainer={trainer} />
+            </Suspense>
+          </div>
           <Button size="lg" disabled>
             Booking opens soon
           </Button>
@@ -112,4 +121,17 @@ async function Trainer({ params }: { params: PageProps<'/trainers/[slug]'>['para
       </Card>
     </div>
   );
+}
+
+async function TrainerOpenTimes({ trainer }: { trainer: PublicTrainer }) {
+  await connection(); // slots depend on the current time
+  const availability = await getCachedAvailability(trainer.userId);
+  const slots = generateSlots({
+    ...availability,
+    timeZone: trainer.timezone,
+    lengthMinutes: 60,
+    now: new Date(),
+    days: 14,
+  });
+  return <OpenTimes slots={slots.slice(0, 60).map((s) => s.toISOString())} />;
 }
