@@ -5,3 +5,4 @@ export * from './trainer-profile';
 export * from './search';
 export * from './availability';
 export * from './time';
+export * from './booking';

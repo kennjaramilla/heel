@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
+import { btree_gist } from '@electric-sql/pglite/contrib/btree_gist';
 import { drizzle as drizzlePg, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import { Pool } from 'pg';
@@ -16,7 +17,9 @@ export function createDb(url = process.env.DATABASE_URL): Db {
   // PGlite speaks the same SQL; the query builder API matches node-postgres.
   const dir = localDataDir();
   mkdirSync(dir, { recursive: true });
-  return drizzlePglite(new PGlite(dir), { schema }) as unknown as Db;
+  return drizzlePglite(new PGlite(dir, { extensions: { btree_gist } }), {
+    schema,
+  }) as unknown as Db;
 }
 
 /** `<repo root>/.data/pglite`, so the migrate script and the Next dev server share one database. */

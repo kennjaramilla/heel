@@ -1,7 +1,6 @@
 'use server';
 
 import { availabilityInput } from '@heel/core';
-import { updateTag } from 'next/cache';
 import { getDb, requireUser } from '@/lib/auth/server';
 import { saveAvailability } from '@/server/availability';
 
@@ -23,6 +22,5 @@ export async function saveHours(
     return { status: 'error', message: parsed.error.issues[0]?.message ?? 'Check your hours.' };
   }
   await saveAvailability(getDb(), trainer.id, parsed.data);
-  updateTag(`availability:${trainer.id}`);
   return { status: 'saved', message: 'Saved. Owners can book these hours.' };
 }

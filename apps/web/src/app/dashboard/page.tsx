@@ -1,5 +1,13 @@
 import type { UserRole } from '@heel/db/schema';
-import { CalendarClock, CreditCard, Dog, Search, ShieldCheck, UserRound } from 'lucide-react';
+import {
+  CalendarCheck,
+  CalendarClock,
+  CreditCard,
+  Dog,
+  Search,
+  ShieldCheck,
+  UserRound,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -22,6 +30,12 @@ const nextSteps: Record<
 > = {
   owner: [
     {
+      icon: CalendarCheck,
+      title: 'Your bookings',
+      body: 'Upcoming and past consults.',
+      href: '/dashboard/bookings',
+    },
+    {
       icon: Dog,
       title: 'Your pets',
       body: 'Name, breed, age and what you need help with.',
@@ -35,6 +49,12 @@ const nextSteps: Record<
     },
   ],
   trainer: [
+    {
+      icon: CalendarCheck,
+      title: 'Your consults',
+      body: 'Who booked you and when.',
+      href: '/dashboard/bookings',
+    },
     {
       icon: UserRound,
       title: 'Complete your profile',

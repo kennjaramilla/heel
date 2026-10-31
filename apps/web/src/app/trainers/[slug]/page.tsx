@@ -1,16 +1,18 @@
-import { formatCents, generateSlots, specialtyLabel } from '@heel/core';
+import { formatCents, specialtyLabel } from '@heel/core';
 import { Award, Cat, Clock, Dog, Languages, MapPin } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
-import { OpenTimes } from '@/components/availability/open-times';
+import { BookingWidget } from '@/components/bookings/booking-widget';
 import { TrainerAvatar } from '@/components/trainers/trainer-avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCachedAvailability, getCachedTrainer } from '@/server/cached';
+import { getDb, getSession } from '@/lib/auth/server';
+import { openSlots } from '@/server/bookings';
+import { getCachedTrainer } from '@/server/cached';
+import { listPets } from '@/server/pets';
 import type { PublicTrainer } from '@/server/trainers';
 
 export async function generateMetadata({
@@ -91,27 +93,9 @@ async function Trainer({ params }: { params: PageProps<'/trainers/[slug]'>['para
           <CardTitle className="text-lg font-semibold">Book a video consult</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3">
-          {[
-            { label: '30 minutes', cents: trainer.price30Cents },
-            { label: '60 minutes', cents: trainer.price60Cents },
-          ].map((o) => (
-            <div
-              key={o.label}
-              className="flex items-center justify-between rounded-xl bg-muted p-3"
-            >
-              <span>{o.label}</span>
-              <span className="font-heading text-lg font-semibold">{formatCents(o.cents)}</span>
-            </div>
-          ))}
-          <div className="mt-2">
-            <p className="mb-3 text-sm font-medium">Next open times (60 min)</p>
-            <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-muted" />}>
-              <TrainerOpenTimes trainer={trainer} />
-            </Suspense>
-          </div>
-          <Button size="lg" disabled>
-            Booking opens soon
-          </Button>
+          <Suspense fallback={<div className="h-72 animate-pulse rounded-xl bg-muted" />}>
+            <Booking trainer={trainer} />
+          </Suspense>
           <p className="text-center text-xs text-muted-foreground">
             <Link href="/trainers" className="hover:underline">
               See other trainers
@@ -123,15 +107,32 @@ async function Trainer({ params }: { params: PageProps<'/trainers/[slug]'>['para
   );
 }
 
-async function TrainerOpenTimes({ trainer }: { trainer: PublicTrainer }) {
-  await connection(); // slots depend on the current time
-  const availability = await getCachedAvailability(trainer.userId);
-  const slots = generateSlots({
-    ...availability,
-    timeZone: trainer.timezone,
-    lengthMinutes: 60,
-    now: new Date(),
-    days: 14,
-  });
-  return <OpenTimes slots={slots.slice(0, 60).map((s) => s.toISOString())} />;
+async function Booking({ trainer }: { trainer: PublicTrainer }) {
+  await connection(); // open times depend on the current time and on other bookings
+  const db = getDb();
+  const now = new Date();
+  const [slots30, slots60, session] = await Promise.all([
+    openSlots(db, trainer, 30, now, 14),
+    openSlots(db, trainer, 60, now, 14),
+    getSession(),
+  ]);
+  const role = session?.user.role;
+  const viewer =
+    role === 'owner'
+      ? {
+          kind: 'owner' as const,
+          pets: (await listPets(db, session!.user.id)).map(({ id, name }) => ({ id, name })),
+        }
+      : role
+        ? { kind: 'trainer' as const }
+        : { kind: 'guest' as const };
+
+  return (
+    <BookingWidget
+      trainerSlug={trainer.slug}
+      prices={{ 30: trainer.price30Cents, 60: trainer.price60Cents }}
+      slots={{ 30: slots30.map((s) => s.toISOString()), 60: slots60.map((s) => s.toISOString()) }}
+      viewer={viewer}
+    />
+  );
 }

@@ -1,8 +1,8 @@
 // Demo data: a few published trainers plus two accounts reviewers can sign in with.
 // Safe to run on every deploy: users are inserted once, profiles are reset to these values.
-import type { TrainerProfileInput } from '@heel/core';
+import { generateSlots, priceFor, type TrainerProfileInput } from '@heel/core';
 import { createDb, schema } from '@heel/db';
-import { inArray } from 'drizzle-orm';
+import { and, eq, gt, inArray } from 'drizzle-orm';
 import { hashPassword } from 'better-auth/crypto';
 import { DEMO_PASSWORD } from '../src/lib/demo';
 
@@ -265,6 +265,51 @@ async function main() {
       },
     ])
     .onConflictDoNothing();
+
+  // Make sure the demo owner always has an upcoming consult with the demo trainer.
+  const upcoming = await db
+    .select({ id: schema.booking.id })
+    .from(schema.booking)
+    .where(
+      and(
+        eq(schema.booking.ownerId, 'seed_owner'),
+        eq(schema.booking.status, 'confirmed'),
+        gt(schema.booking.startsAt, new Date()),
+      ),
+    );
+  if (upcoming.length === 0) {
+    const sam = trainers[0]!;
+    const rules = hours[sam.id]!.flatMap(([days, start, end]) =>
+      days.map((weekday) => ({ weekday, startMinute: start * 60, endMinute: end * 60 })),
+    );
+    const [slot] = generateSlots({
+      rules,
+      blockedDates: [],
+      timeZone: sam.timezone,
+      lengthMinutes: 60,
+      now: new Date(Date.now() + 2 * 86_400_000),
+    });
+    if (slot) {
+      await db
+        .insert(schema.booking)
+        .values({
+          id: crypto.randomUUID(),
+          trainerId: sam.id,
+          ownerId: 'seed_owner',
+          petId: 'seed_pet_mochi',
+          petName: 'Mochi',
+          startsAt: slot,
+          endsAt: new Date(slot.getTime() + 60 * 60_000),
+          lengthMinutes: 60,
+          status: 'confirmed',
+          paymentProvider: 'demo',
+          paymentRef: 'demo_seed',
+          ownerNote: 'She pulls hardest when she sees other dogs.',
+          ...priceFor(sam, 60),
+        })
+        .onConflictDoNothing();
+    }
+  }
 
   console.log(`Seeded ${trainers.length} trainers, ${owners.length} owner and 2 pets.`);
   process.exit(0);

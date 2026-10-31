@@ -29,6 +29,20 @@
       "when": 1793429344319,
       "tag": "0003_availability",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793429786713,
+      "tag": "0004_bookings",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793429787044,
+      "tag": "0005_booking_no_overlap",
+      "breakpoints": true
     }
   ]
 }

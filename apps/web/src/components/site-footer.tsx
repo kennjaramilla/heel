@@ -11,7 +11,7 @@ export function SiteFooter() {
           </p>
         </div>
         <p className="text-sm text-muted-foreground">
-          Payments run in Stripe test mode. Use card 4242 4242 4242 4242.
+          Payments run in test mode. No real money moves.
         </p>
       </div>
     </footer>
