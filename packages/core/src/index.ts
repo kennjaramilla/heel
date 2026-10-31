@@ -6,3 +6,4 @@ export * from './search';
 export * from './availability';
 export * from './time';
 export * from './booking';
+export * from './refunds';
