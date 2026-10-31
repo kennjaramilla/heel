@@ -50,6 +50,13 @@
       "when": 1793430434217,
       "tag": "0006_cancellations",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793430813167,
+      "tag": "0007_plans_and_payouts",
+      "breakpoints": true
     }
   ]
 }
