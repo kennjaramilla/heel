@@ -2,12 +2,13 @@
 
 import { LANGUAGES, SPECIALTIES, SPECIES } from '@heel/core';
 import Link from 'next/link';
-import { useActionState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { type ProfileFormState, saveProfile } from '@/app/dashboard/profile/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { TrainerProfile } from '@/server/trainers';
+import { useFormAction } from '@/lib/use-form-action';
 import { cn } from '@/lib/utils';
 
 const initialState: ProfileFormState = { status: 'idle' };
@@ -19,7 +20,7 @@ export function ProfileForm({
   profile: TrainerProfile | null;
   timeZones: string[];
 }) {
-  const [state, action, pending] = useActionState(saveProfile, initialState);
+  const [state, onSubmit, pending] = useFormAction(saveProfile, initialState);
   const timezoneRef = useRef<HTMLSelectElement>(null);
   const errors = state.fieldErrors ?? {};
   const slug = state.slug ?? profile?.slug;
@@ -33,7 +34,7 @@ export function ProfileForm({
   }, [profile, timeZones]);
 
   return (
-    <form action={action} className="grid gap-8">
+    <form onSubmit={onSubmit} className="grid gap-8">
       <Section title="About you">
         <Field label="Headline" name="headline" error={errors.headline}>
           <Input

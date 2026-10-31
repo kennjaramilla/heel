@@ -45,6 +45,7 @@ const nextSteps: Record<
       icon: CalendarClock,
       title: 'Set your weekly hours',
       body: 'Owners can only book open slots.',
+      href: '/dashboard/availability',
     },
     { icon: CreditCard, title: 'Connect payouts', body: 'Get paid after each consult via Stripe.' },
   ],
