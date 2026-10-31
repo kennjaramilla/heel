@@ -1,8 +1,8 @@
 // Demo data: a few published trainers plus two accounts reviewers can sign in with.
 // Safe to run on every deploy: users are inserted once, profiles are reset to these values.
-import { generateSlots, priceFor, type TrainerProfileInput } from '@heel/core';
+import { generateSlots, payoutDueAt, priceFor, type TrainerProfileInput } from '@heel/core';
 import { createDb, schema } from '@heel/db';
-import { and, eq, gt, inArray } from 'drizzle-orm';
+import { and, eq, gt, inArray, lte } from 'drizzle-orm';
 import { hashPassword } from 'better-auth/crypto';
 import { DEMO_PASSWORD } from '../src/lib/demo';
 
@@ -309,6 +309,78 @@ async function main() {
         })
         .onConflictDoNothing();
     }
+  }
+
+  // A past consult with a finished plan and a paid-out trainer, so both sides have history to look at.
+  const hourMs = 3_600_000;
+  const pastStart = new Date(Math.floor(Date.now() / hourMs) * hourMs - 7 * 24 * hourMs);
+  const sam = trainers[0]!;
+  const done = await db
+    .insert(schema.booking)
+    .values({
+      id: 'seed_past_consult',
+      trainerId: sam.id,
+      ownerId: 'seed_owner',
+      petId: 'seed_pet_mochi',
+      petName: 'Mochi',
+      startsAt: pastStart,
+      endsAt: new Date(pastStart.getTime() + hourMs),
+      lengthMinutes: 60,
+      status: 'completed',
+      completedAt: new Date(pastStart.getTime() + 2 * hourMs),
+      payoutStatus: 'paid',
+      payoutDueAt: payoutDueAt(new Date(pastStart.getTime() + 2 * hourMs)),
+      payoutRef: 'demo_payout_seed',
+      paymentProvider: 'demo',
+      paymentRef: 'demo_seed_past',
+      ...priceFor(sam, 60),
+    })
+    .onConflictDoNothing()
+    .returning({ id: schema.booking.id });
+  if (done.length) {
+    await db.insert(schema.trainingPlan).values({
+      bookingId: 'seed_past_consult',
+      summary:
+        'Mochi is smart and food-motivated. She pulls hardest in the first five minutes, so we will burn some energy before walks and reward a loose leash early.',
+      steps: [
+        'Five minutes of sniffing games in the yard before every walk',
+        'Stop the moment the leash goes tight; reward when she comes back to your side',
+        'Two short training walks a day for the next two weeks',
+        'Send me a 1-minute video next week so I can check her progress',
+      ],
+    });
+  }
+
+  // A consult that just ended and still needs a plan, so the trainer demo can write one.
+  const awaiting = await db
+    .select({ id: schema.booking.id })
+    .from(schema.booking)
+    .where(
+      and(
+        eq(schema.booking.trainerId, sam.id),
+        eq(schema.booking.status, 'confirmed'),
+        lte(schema.booking.endsAt, new Date()),
+      ),
+    );
+  if (awaiting.length === 0) {
+    const start = new Date(Math.floor(Date.now() / hourMs) * hourMs - 3 * hourMs);
+    await db
+      .insert(schema.booking)
+      .values({
+        id: crypto.randomUUID(),
+        trainerId: sam.id,
+        ownerId: 'seed_owner',
+        petId: 'seed_pet_pepper',
+        petName: 'Pepper',
+        startsAt: start,
+        endsAt: new Date(start.getTime() + 30 * 60_000),
+        lengthMinutes: 30,
+        status: 'confirmed',
+        paymentProvider: 'demo',
+        paymentRef: 'demo_seed_recent',
+        ...priceFor(sam, 30),
+      })
+      .onConflictDoNothing();
   }
 
   console.log(`Seeded ${trainers.length} trainers, ${owners.length} owner and 2 pets.`);
