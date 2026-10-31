@@ -1,10 +1,12 @@
 import {
   type BookingRequest,
+  type CancelledBy,
   type ConsultLength,
   generateSlots,
   HOLD_MINUTES,
   type Interval,
   priceFor,
+  refundFor,
 } from '@heel/core';
 import type { Db } from '@heel/db';
 import { schema } from '@heel/db';
@@ -225,4 +227,73 @@ export async function listBookings(
         b.status === 'confirmed' || (role === 'owner' && b.holdExpiresAt && b.holdExpiresAt > now),
     );
   return { upcoming: visibleUpcoming, past: past.map(toView) };
+}
+
+export type CancelResult =
+  | { ok: true; booking: Booking }
+  | { ok: false; error: 'not-found' | 'already-started' | 'not-cancellable' };
+
+/**
+ * Cancels a confirmed booking and refunds according to the policy. The status change is one
+ * conditional UPDATE, so a booking can only be cancelled (and refunded) once.
+ */
+export async function cancelBooking(
+  db: Db,
+  input: { bookingId: string; userId: string; by: CancelledBy; reason?: string },
+  refund: (booking: Booking, amountCents: number) => Promise<string>,
+  now = new Date(),
+): Promise<CancelResult> {
+  const party =
+    input.by === 'owner'
+      ? eq(booking.ownerId, input.userId)
+      : input.by === 'trainer'
+        ? eq(booking.trainerId, input.userId)
+        : undefined; // admins can cancel any booking
+  const [current] = await db
+    .select()
+    .from(booking)
+    .where(and(eq(booking.id, input.bookingId), party));
+  if (!current) return { ok: false, error: 'not-found' };
+  if (current.status !== 'confirmed') return { ok: false, error: 'not-cancellable' };
+
+  const decision = refundFor(current, input.by, now);
+  if (!decision.allowed) return { ok: false, error: decision.reason };
+
+  const [cancelled] = await db
+    .update(booking)
+    .set({
+      status: 'cancelled',
+      cancelledAt: now,
+      cancelledBy: input.by,
+      cancelReason: input.reason?.trim() || null,
+      refundCents: decision.refundCents,
+      platformFeeCents: decision.platformKeepsCents,
+      trainerPayoutCents: decision.trainerKeepsCents,
+    })
+    .where(
+      and(eq(booking.id, current.id), eq(booking.status, 'confirmed'), gt(booking.startsAt, now)),
+    )
+    .returning();
+  if (!cancelled) return { ok: false, error: 'not-cancellable' };
+
+  if (decision.refundCents > 0) {
+    const refundRef = await refund(cancelled, decision.refundCents);
+    const [withRef] = await db
+      .update(booking)
+      .set({ refundRef })
+      .where(eq(booking.id, cancelled.id))
+      .returning();
+    return { ok: true, booking: withRef! };
+  }
+  return { ok: true, booking: cancelled };
+}
+
+/** Owners can let go of a hold they no longer want, so the time frees up straight away. */
+export async function releaseHold(db: Db, ownerId: string, bookingId: string) {
+  const [row] = await db
+    .update(booking)
+    .set({ status: 'expired', holdExpiresAt: null })
+    .where(and(eq(booking.id, bookingId), eq(booking.ownerId, ownerId), eq(booking.status, 'held')))
+    .returning();
+  return row ?? null;
 }

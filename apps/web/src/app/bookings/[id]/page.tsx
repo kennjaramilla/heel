@@ -1,11 +1,13 @@
-import { formatCents } from '@heel/core';
-import { CalendarCheck, CircleAlert, Clock, Dog, PartyPopper, Video } from 'lucide-react';
+import { formatCents, refundFor } from '@heel/core';
+import { Ban, CalendarCheck, CircleAlert, Clock, Dog, PartyPopper, Video } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import { CancelPanel } from '@/components/bookings/cancel-panel';
 import { HoldCountdown } from '@/components/bookings/hold-countdown';
 import { PayButton } from '@/components/bookings/pay-button';
+import { ReleaseHoldButton } from '@/components/bookings/release-hold-button';
 import { LocalTime } from '@/components/local-time';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -55,6 +57,18 @@ async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>[
       {holdLive && isOwner && (
         <h1 className="text-3xl font-bold tracking-tight">Confirm and pay</h1>
       )}
+      {booking.status === 'cancelled' && (
+        <div className="flex items-start gap-3 rounded-2xl bg-muted p-5">
+          <Ban className="mt-0.5 size-6 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <div>
+            <h1 className="text-2xl font-bold">Cancelled</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {cancelledText(booking, isOwner)}
+              {booking.cancelReason && <> Reason: “{booking.cancelReason}”</>}
+            </p>
+          </div>
+        </div>
+      )}
       {holdGone && (
         <div className="flex items-start gap-3 rounded-2xl bg-destructive/10 p-5 text-destructive">
           <CircleAlert className="mt-0.5 size-6 shrink-0" aria-hidden="true" />
@@ -79,6 +93,7 @@ async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>[
             <p className="text-center text-xs text-muted-foreground">
               {getPaymentProvider().label}
             </p>
+            <ReleaseHoldButton bookingId={booking.id} />
           </CardContent>
         </Card>
       )}
@@ -88,6 +103,10 @@ async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>[
           <Video className="size-4" aria-hidden="true" /> The video link appears here 10 minutes
           before the start.
         </p>
+      )}
+
+      {booking.status === 'confirmed' && booking.startsAt > now && (
+        <Cancel booking={booking} isOwner={isOwner} now={now} />
       )}
 
       <div className="flex flex-wrap gap-2">
@@ -154,5 +173,39 @@ function PriceBreakdown({ booking }: { booking: BookingView }) {
         <dd>{formatCents(booking.platformFeeCents)}</dd>
       </div>
     </dl>
+  );
+}
+
+function cancelledText(booking: BookingView, isOwner: boolean) {
+  const who =
+    booking.cancelledBy === (isOwner ? 'owner' : 'trainer')
+      ? 'You cancelled this consult.'
+      : booking.cancelledBy === 'admin'
+        ? 'Heel cancelled this consult.'
+        : `${isOwner ? booking.trainerName : booking.ownerName} cancelled this consult.`;
+  const money = isOwner
+    ? booking.refundCents > 0
+      ? ` ${formatCents(booking.refundCents)} was refunded to your card.`
+      : ''
+    : booking.trainerPayoutCents > 0
+      ? ` You keep ${formatCents(booking.trainerPayoutCents)} for the late cancellation.`
+      : '';
+  return who + money;
+}
+
+function Cancel({ booking, isOwner, now }: { booking: BookingView; isOwner: boolean; now: Date }) {
+  const decision = refundFor(booking, isOwner ? 'owner' : 'trainer', now);
+  if (!decision.allowed) return null;
+  const policy = isOwner
+    ? decision.percent === 100
+      ? `You'll get the full ${formatCents(decision.refundCents)} back.`
+      : `It's less than 24 hours away, so you'll get ${formatCents(decision.refundCents)} back (50%).`
+    : `${booking.ownerName} will get a full refund of ${formatCents(decision.refundCents)}, and you won't be paid for this consult.`;
+  return (
+    <CancelPanel
+      bookingId={booking.id}
+      policy={policy}
+      confirmLabel={`Yes, cancel and refund ${formatCents(decision.refundCents)}`}
+    />
   );
 }

@@ -3,7 +3,14 @@ import { schema } from '@heel/db';
 import { createTestDb } from '@heel/db/testing';
 import { describe, expect, it } from 'vitest';
 import { saveAvailability } from './availability';
-import { confirmBooking, createHold, expireStaleHolds, listBookings, openSlots } from './bookings';
+import {
+  cancelBooking,
+  confirmBooking,
+  createHold,
+  expireStaleHolds,
+  listBookings,
+  openSlots,
+} from './bookings';
 import { createPet } from './pets';
 import { saveTrainerProfile } from './trainers';
 
@@ -185,5 +192,82 @@ describe('listBookings', () => {
     );
     const trainerView = await listBookings(db, 'sam', 'trainer', now);
     expect(trainerView.upcoming.map((b) => [b.ownerName, b.petName])).toEqual([['Olive', 'Mochi']]);
+  });
+});
+
+describe('cancelBooking', () => {
+  async function confirmed() {
+    const ctx = await setup();
+    const hold = await createHold(ctx.db, 'olive', request(ctx.olivesPet.id), now);
+    if (!hold.ok) throw new Error('hold failed');
+    await confirmBooking(
+      ctx.db,
+      { bookingId: hold.booking.id, ownerId: 'olive', provider: 'demo', paymentRef: 'p' },
+      now,
+    );
+    const refunds: number[] = [];
+    const refund = async (_b: unknown, cents: number) => {
+      refunds.push(cents);
+      return `refund_${cents}`;
+    };
+    return { ...ctx, id: hold.booking.id, refunds, refund };
+  }
+
+  it('refunds an early owner cancellation in full and frees the slot', async () => {
+    const { db, id, refunds, refund, omarsPet } = await confirmed();
+    const result = await cancelBooking(
+      db,
+      { bookingId: id, userId: 'olive', by: 'owner', reason: 'Sick pup' },
+      refund,
+      now,
+    );
+    expect(result.ok && result.booking).toMatchObject({
+      status: 'cancelled',
+      refundCents: 4500,
+      trainerPayoutCents: 0,
+      platformFeeCents: 0,
+      refundRef: 'refund_4500',
+      cancelReason: 'Sick pup',
+    });
+    expect(refunds).toEqual([4500]);
+    expect((await createHold(db, 'omar', request(omarsPet.id), now)).ok).toBe(true);
+  });
+
+  it('refunds half when the owner cancels late, and only once', async () => {
+    const { db, id, refunds, refund } = await confirmed();
+    const late = new Date('2026-11-02T03:00:00Z'); // 12 hours before
+    const first = await cancelBooking(
+      db,
+      { bookingId: id, userId: 'olive', by: 'owner' },
+      refund,
+      late,
+    );
+    expect(first.ok && first.booking.refundCents).toBe(2250);
+    expect(
+      await cancelBooking(db, { bookingId: id, userId: 'olive', by: 'owner' }, refund, late),
+    ).toEqual({
+      ok: false,
+      error: 'not-cancellable',
+    });
+    expect(refunds).toEqual([2250]);
+  });
+
+  it('lets the trainer cancel with a full refund, but not strangers or after the start', async () => {
+    const { db, id, refund } = await confirmed();
+    expect(
+      await cancelBooking(db, { bookingId: id, userId: 'omar', by: 'owner' }, refund, now),
+    ).toEqual({
+      ok: false,
+      error: 'not-found',
+    });
+    const started = new Date('2026-11-02T15:30:00Z');
+    expect(
+      await cancelBooking(db, { bookingId: id, userId: 'sam', by: 'trainer' }, refund, started),
+    ).toEqual({
+      ok: false,
+      error: 'already-started',
+    });
+    const r = await cancelBooking(db, { bookingId: id, userId: 'sam', by: 'trainer' }, refund, now);
+    expect(r.ok && r.booking.refundCents).toBe(4500);
   });
 });

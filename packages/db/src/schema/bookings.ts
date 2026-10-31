@@ -12,6 +12,8 @@ export const bookingStatus = pgEnum('booking_status', [
 ]);
 export type BookingStatus = (typeof bookingStatus.enumValues)[number];
 
+export const cancelledBy = pgEnum('cancelled_by', ['owner', 'trainer', 'admin']);
+
 export const booking = pgTable(
   'booking',
   {
@@ -35,6 +37,12 @@ export const booking = pgTable(
     paymentProvider: text('payment_provider'),
     paymentRef: text('payment_ref'),
     ownerNote: text('owner_note').notNull().default(''),
+    // On cancellation the fee and payout shrink to what each side keeps; the rest is refunded.
+    refundCents: integer('refund_cents').notNull().default(0),
+    refundRef: text('refund_ref'),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    cancelledBy: cancelledBy('cancelled_by'),
+    cancelReason: text('cancel_reason'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -45,7 +53,10 @@ export const booking = pgTable(
     index('booking_trainer_starts_idx').on(t.trainerId, t.startsAt),
     index('booking_owner_starts_idx').on(t.ownerId, t.startsAt),
     check('booking_times', sql`${t.endsAt} > ${t.startsAt}`),
-    check('booking_money', sql`${t.platformFeeCents} + ${t.trainerPayoutCents} = ${t.priceCents}`),
+    check(
+      'booking_money',
+      sql`${t.platformFeeCents} + ${t.trainerPayoutCents} + ${t.refundCents} = ${t.priceCents}`,
+    ),
     // No-overlap rules are exclusion constraints, added in a hand-written migration (0005).
   ],
 );
