@@ -23,10 +23,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { CatTarget, Fetch, LeashWalk } from '@/components/scenes/mini-scenes';
+import { s as scenes } from '@/components/scenes/classes';
+import { TrainingYard } from '@/components/scenes/training-yard';
 import { TrainerCard } from '@/components/trainers/trainer-card';
 import { getCachedTrainers } from '@/server/cached';
 
@@ -119,9 +120,11 @@ export default function Home() {
             </ul>
           </div>
 
-          <BookingPreview />
+          <HeroScene />
         </div>
       </section>
+
+      <Wins />
 
       <section id="specialties" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
         <SectionHeading
@@ -251,45 +254,76 @@ function SectionHeading({
   );
 }
 
-function BookingPreview() {
+function HeroScene() {
   return (
-    <div className="relative mx-auto w-full max-w-md" aria-label="Example booking">
-      <Card className="rotate-1 shadow-xl shadow-primary/10">
-        <CardHeader className="flex items-center justify-between">
-          <p className="font-heading font-semibold">Upcoming consult</p>
-          <Badge>Confirmed</Badge>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="flex items-center gap-3 rounded-xl bg-muted p-3">
-            <span className="flex size-11 items-center justify-center rounded-full bg-accent text-accent-foreground">
-              <Dog className="size-5" aria-hidden="true" />
-            </span>
-            <div>
-              <p className="font-semibold">Mochi</p>
-              <p className="text-sm text-muted-foreground">Shiba Inu · 8 months · Leash pulling</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Avatar size="lg">
-              <AvatarFallback className="bg-secondary font-semibold text-secondary-foreground">
-                SR
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">with Sam Rivera</p>
-              <p className="text-sm text-muted-foreground">Tue, 7:00 PM your time · 60 min</p>
-            </div>
-          </div>
-          <Button className="w-full" disabled>
-            <Video aria-hidden="true" /> Join opens 10 minutes before
-          </Button>
-        </CardContent>
-      </Card>
-      <div className="absolute -bottom-6 -left-4 flex -rotate-2 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 shadow-lg sm:-left-10">
+    <div className="relative mx-auto w-full max-w-xl">
+      <div className="overflow-hidden rounded-[2rem] border border-border shadow-xl shadow-primary/10">
+        <TrainingYard className="block h-auto w-full" />
+      </div>
+      <div
+        className={`${scenes.float} absolute -top-4 right-4 flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 shadow-lg`}
+      >
+        <CalendarCheck className="size-5 text-primary" aria-hidden="true" />
+        <span className="text-sm">
+          <span className="font-semibold">Mochi</span> with Sam · Tue 7:00 PM
+        </span>
+      </div>
+      <div
+        className={`${scenes.float} ${scenes.floatLate} absolute -bottom-5 left-4 flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 shadow-lg sm:-left-8`}
+      >
         <ClipboardList className="size-5 text-amber" aria-hidden="true" />
         <span className="text-sm font-medium">Training plan sent</span>
       </div>
     </div>
+  );
+}
+
+const wins = [
+  {
+    Scene: LeashWalk,
+    title: 'Loose-leash walks',
+    body: 'Mochi went from pulling to walking at your side in three weeks.',
+    specialty: 'leash-pulling',
+  },
+  {
+    Scene: Fetch,
+    title: 'Come back, every time',
+    body: 'Recall games that turn "come!" into the best word they know.',
+    specialty: 'recall',
+  },
+  {
+    Scene: CatTarget,
+    title: 'Happy, busy cats',
+    body: 'Play and target training that saves your sofa (and your ankles).',
+    specialty: 'cat-behaviour',
+  },
+] as const;
+
+function Wins() {
+  return (
+    <section className="mx-auto w-full max-w-6xl px-4 pt-8 pb-4 sm:px-6">
+      <SectionHeading
+        eyebrow="What training looks like"
+        title="Small wins, every week"
+        body="Each consult ends with a plan you can practise at home, a few minutes a day."
+      />
+      <ul className="mt-10 grid gap-5 md:grid-cols-3">
+        {wins.map(({ Scene, title, body, specialty }) => (
+          <li key={title}>
+            <Link
+              href={`/trainers?specialty=${specialty}`}
+              className="group block h-full overflow-hidden rounded-3xl border border-border bg-card transition hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10"
+            >
+              <Scene />
+              <div className="p-5">
+                <h3 className="text-lg font-semibold group-hover:text-primary">{title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

@@ -1,0 +1,333 @@
+/* Looping pet-training illustrations. Every animation stops for reduced-motion users. */
+
+/* Shared body parts */
+.pet-tail {
+  transform-box: fill-box;
+  transform-origin: 100% 100%;
+  animation: pet-wag 0.35s ease-in-out infinite alternate;
+}
+.pet-cat-tail {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: pet-sway 1.6s ease-in-out infinite alternate;
+}
+.pet-leg-a,
+.pet-leg-b {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: pet-stride 0.32s ease-in-out infinite alternate;
+}
+.pet-leg-b {
+  animation-delay: -0.16s;
+}
+.pet-ear {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: pet-flop 0.64s ease-in-out infinite alternate;
+}
+
+@keyframes pet-wag {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+@keyframes pet-sway {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+@keyframes pet-stride {
+  from {
+    transform: rotate(-22deg);
+  }
+  to {
+    transform: rotate(22deg);
+  }
+}
+@keyframes pet-flop {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+/* Hero: run, clear the hurdle, get the treat */
+.pet-hero-dog {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: pet-run-jump 5.2s cubic-bezier(0.45, 0, 0.4, 1) infinite;
+}
+@keyframes pet-run-jump {
+  0% {
+    transform: translate(-150px, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(110px, 0);
+  }
+  42% {
+    transform: translate(190px, -100px) rotate(-10deg);
+  }
+  54% {
+    transform: translate(262px, 0) rotate(7deg);
+  }
+  60% {
+    transform: translate(290px, -6px) rotate(0deg);
+  }
+  64%,
+  90% {
+    transform: translate(300px, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(300px, 0);
+    opacity: 0;
+  }
+}
+.pet-trainer-arm {
+  transform-box: fill-box;
+  transform-origin: 85% 10%;
+  animation: pet-reward 5.2s ease-in-out infinite;
+}
+@keyframes pet-reward {
+  0%,
+  56% {
+    transform: rotate(0deg);
+  }
+  66%,
+  88% {
+    transform: rotate(26deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.pet-bubble {
+  transform-box: fill-box;
+  transform-origin: 20% 100%;
+  animation: pet-pop 5.2s ease-out infinite;
+}
+@keyframes pet-pop {
+  0%,
+  60% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  66% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+  70%,
+  90% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+.pet-heart {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: pet-rise 5.2s ease-out infinite;
+}
+.pet-heart2 {
+  animation-delay: 0.25s;
+}
+@keyframes pet-rise {
+  0%,
+  64% {
+    transform: translateY(0) scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1);
+  }
+  96%,
+  100% {
+    transform: translateY(-56px) scale(1);
+    opacity: 0;
+  }
+}
+.pet-print {
+  animation: pet-print 5.2s linear infinite;
+}
+@keyframes pet-print {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  70% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.pet-cloud {
+  animation: pet-drift 14s ease-in-out infinite alternate;
+}
+.pet-cloud-slow {
+  animation-duration: 20s;
+  animation-direction: alternate-reverse;
+}
+@keyframes pet-drift {
+  from {
+    transform: translateX(-30px);
+  }
+  to {
+    transform: translateX(40px);
+  }
+}
+.pet-float {
+  animation: pet-float 4s ease-in-out infinite alternate;
+}
+.pet-float-late {
+  animation-delay: -2s;
+}
+@keyframes pet-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+/* Leash walk: the ground scrolls under a trotting dog */
+.pet-ground {
+  animation: pet-scroll 1.6s linear infinite;
+}
+@keyframes pet-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-60px);
+  }
+}
+.pet-bob {
+  animation: pet-bob 0.32s ease-in-out infinite alternate;
+}
+@keyframes pet-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+/* Fetch: the ball arcs out and the dog chases it back */
+.pet-ball {
+  animation: pet-throw 3.2s ease-in-out infinite;
+}
+@keyframes pet-throw {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(70px, -70px);
+  }
+  50% {
+    transform: translate(140px, 0);
+  }
+  58% {
+    transform: translate(150px, -14px);
+  }
+  66% {
+    transform: translate(158px, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+.pet-fetch-dog {
+  animation: pet-chase 3.2s ease-in-out infinite;
+}
+@keyframes pet-chase {
+  0%,
+  20% {
+    transform: translateX(0) scaleX(1);
+  }
+  60% {
+    transform: translateX(80px) scaleX(1);
+  }
+  62%,
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
+}
+
+/* Cat target training: paw swipes at a circling feather */
+.pet-wand {
+  transform-box: view-box;
+  transform-origin: 24px 26px;
+  animation: pet-circle 2.4s ease-in-out infinite alternate;
+}
+@keyframes pet-circle {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+.pet-swipe {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: pet-swipe 2.4s ease-in-out infinite;
+}
+@keyframes pet-swipe {
+  0%,
+  40% {
+    transform: rotate(0deg);
+  }
+  55% {
+    transform: rotate(-38deg) translateY(-6px);
+  }
+  70%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+.pet-track {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  animation: pet-track 2.4s ease-in-out infinite alternate;
+}
+@keyframes pet-track {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-scene * {
+    animation: none !important;
+  }
+  .pet-hero-dog {
+    transform: translate(300px, 0);
+  }
+  .pet-bubble,
+  .pet-heart {
+    opacity: 1;
+    transform: none;
+  }
+}
