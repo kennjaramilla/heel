@@ -1,14 +1,13 @@
 import { getDb } from '@/lib/auth/server';
+import { isCronRequest } from '@/lib/cron-auth';
 import { recordAudit } from '@/server/audit';
 import { autoCompleteConsults, releaseDuePayouts } from '@/server/completion';
+import { notifyPayoutsPaid, sendReminders } from '@/server/notifications';
 import { getPaymentProvider } from '@/server/payments';
 
-// Called once a day by Vercel Cron (see vercel.json). Vercel sends the CRON_SECRET as a bearer token.
+// Called once a day by Vercel Cron (see vercel.json).
 export async function GET(request: Request) {
-  const secret = process.env.CRON_SECRET;
-  if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  if (!isCronRequest(request)) return new Response('Unauthorized', { status: 401 });
   const db = getDb();
   const provider = getPaymentProvider();
   const completed = await autoCompleteConsults(db);
@@ -21,5 +20,8 @@ export async function GET(request: Request) {
       targetId: id,
     });
   }
-  return Response.json({ completed, paid: paid.length });
+  await notifyPayoutsPaid(db, paid);
+  // Hobby crons run daily, so reminders also run hourly from GitHub Actions (reminders.yml).
+  const reminded = await sendReminders(db);
+  return Response.json({ completed, paid: paid.length, reminded });
 }

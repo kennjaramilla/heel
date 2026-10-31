@@ -5,6 +5,7 @@ import { getDb, requireUser } from '@/lib/auth/server';
 import { setSuspended } from '@/server/admin';
 import { recordAudit } from '@/server/audit';
 import { cancelBooking } from '@/server/bookings';
+import { notifyBookingCancelled } from '@/server/notifications';
 import { getPaymentProvider } from '@/server/payments';
 
 export type AdminActionState = { message?: string; ok?: boolean };
@@ -64,6 +65,7 @@ export async function adminCancelAction(
     targetId: bookingId,
     details: { by: 'admin', refundCents: result.booking.refundCents },
   });
+  await notifyBookingCancelled(db, bookingId);
   revalidatePath('/admin/bookings');
   return { ok: true };
 }

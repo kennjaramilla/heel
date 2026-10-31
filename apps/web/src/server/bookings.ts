@@ -209,6 +209,12 @@ const toView = (r: {
   ownerName: r.ownerName,
 });
 
+/** Any booking by id. For server jobs only; pages use getBookingForUser. */
+export async function getBooking(db: Db, bookingId: string) {
+  const [row] = await bookingViewQuery(db).where(eq(booking.id, bookingId));
+  return row ? toView(row) : null;
+}
+
 /** A booking visible to this user: they're the owner or the trainer on it. */
 export async function getBookingForUser(db: Db, userId: string, bookingId: string) {
   const [row] = await bookingViewQuery(db).where(

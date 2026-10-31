@@ -5,6 +5,7 @@ import type { SupportStatus } from '@heel/db/schema';
 import { and, asc, desc, eq, ne, or } from 'drizzle-orm';
 import { ADMIN_PAGE_SIZE } from './admin';
 import { recordAudit } from './audit';
+import { notifySupportReply } from './notifications';
 
 const { supportTicket, supportMessage, booking, user } = schema;
 
@@ -87,6 +88,7 @@ export async function replyToTicket(
   const ticket = await getTicket(db, author, ticketId);
   if (!ticket) return { ok: false, error: 'not-found' };
   const now = new Date();
+  const messageId = crypto.randomUUID();
   const updated = await db.transaction(async (tx) => {
     const [row] = await tx
       .update(supportTicket)
@@ -95,7 +97,7 @@ export async function replyToTicket(
       .returning({ id: supportTicket.id });
     if (!row) return false;
     await tx.insert(supportMessage).values({
-      id: crypto.randomUUID(),
+      id: messageId,
       ticketId,
       authorId: author.id,
       fromStaff,
@@ -112,6 +114,7 @@ export async function replyToTicket(
       targetType: 'support_ticket',
       targetId: ticketId,
     });
+    await notifySupportReply(db, ticketId, messageId);
   }
   return { ok: true };
 }

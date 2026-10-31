@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { getDb, requireUser } from '@/lib/auth/server';
 import { recordAudit } from '@/server/audit';
 import { saveTrainingPlan } from '@/server/completion';
+import { notifyPlanSent } from '@/server/notifications';
 
 export type PlanState = { message?: string };
 
@@ -31,5 +32,6 @@ export async function savePlanAction(_prev: PlanState, form: FormData): Promise<
     targetType: 'booking',
     targetId: bookingId,
   });
+  await notifyPlanSent(db, bookingId);
   redirect(`/bookings/${bookingId}`);
 }
