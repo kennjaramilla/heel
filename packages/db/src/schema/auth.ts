@@ -1,4 +1,13 @@
-import { boolean, index, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  boolean,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 
 // Tables used by Better Auth. Column names follow its core schema.
 export const userRole = pgEnum('user_role', ['owner', 'trainer', 'admin']);
@@ -72,3 +81,11 @@ export const verification = pgTable(
   },
   (t) => [index('verification_identifier_idx').on(t.identifier)],
 );
+
+// Better Auth's rate limiter keeps its counters here, so limits hold across serverless instances.
+export const rateLimit = pgTable('rate_limit', {
+  id: text('id').primaryKey(),
+  key: text('key').notNull().unique(),
+  count: integer('count').notNull(),
+  lastRequest: bigint('last_request', { mode: 'number' }).notNull(),
+});
