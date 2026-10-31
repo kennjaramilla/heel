@@ -2,7 +2,6 @@ import 'server-only';
 import { cacheLife, cacheTag } from 'next/cache';
 import { getDb } from '@/lib/auth/server';
 import type { TrainerSearch } from '@heel/core';
-import { getAvailability } from './availability';
 import { getPublishedTrainerBySlug, listPublishedTrainers, searchTrainers } from './trainers';
 
 // Public reads are cached and tagged; saving a profile calls updateTag() to refresh them.
@@ -25,11 +24,4 @@ export async function getCachedSearch(search: TrainerSearch) {
   cacheTag('trainers');
   cacheLife('minutes');
   return searchTrainers(getDb(), search);
-}
-
-export async function getCachedAvailability(trainerId: string) {
-  'use cache';
-  cacheTag(`availability:${trainerId}`);
-  cacheLife('hours');
-  return getAvailability(getDb(), trainerId);
 }
