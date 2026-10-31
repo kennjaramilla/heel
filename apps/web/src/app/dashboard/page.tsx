@@ -1,6 +1,7 @@
 import type { UserRole } from '@heel/db/schema';
 import { CalendarClock, CreditCard, Dog, Search, ShieldCheck, UserRound } from 'lucide-react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Suspense } from 'react';
 import { SignOutButton } from '@/components/auth/sign-out-button';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +16,26 @@ const roleLabel: Record<UserRole, string> = {
   admin: 'Admin',
 };
 
-const nextSteps: Record<UserRole, { icon: typeof Dog; title: string; body: string }[]> = {
+const nextSteps: Record<
+  UserRole,
+  { icon: typeof Dog; title: string; body: string; href?: string }[]
+> = {
   owner: [
     { icon: Dog, title: 'Add your pet', body: 'Name, breed, age and what you need help with.' },
-    { icon: Search, title: 'Find a trainer', body: 'Search by specialty and book a time.' },
+    {
+      icon: Search,
+      title: 'Find a trainer',
+      body: 'Search by specialty and book a time.',
+      href: '/trainers',
+    },
   ],
   trainer: [
-    { icon: UserRound, title: 'Complete your profile', body: 'Bio, specialties and your price.' },
+    {
+      icon: UserRound,
+      title: 'Complete your profile',
+      body: 'Bio, specialties and your price.',
+      href: '/dashboard/profile',
+    },
     {
       icon: CalendarClock,
       title: 'Set your weekly hours',
@@ -58,9 +72,16 @@ async function Dashboard() {
         <SignOutButton />
       </div>
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {nextSteps[user.role].map(({ icon: Icon, title, body }) => (
-          <li key={title}>
-            <Card className="h-full">
+        {nextSteps[user.role].map(({ icon: Icon, title, body, href }) => (
+          <li key={title} className="relative">
+            {href && (
+              <Link href={href} className="absolute inset-0 z-10 rounded-xl" aria-label={title} />
+            )}
+            <Card
+              className={
+                href ? 'h-full transition-colors hover:ring-primary/40' : 'h-full opacity-70'
+              }
+            >
               <CardHeader>
                 <Icon className="size-5 text-primary" aria-hidden="true" />
                 <CardTitle className="mt-2 text-base font-semibold">{title}</CardTitle>
