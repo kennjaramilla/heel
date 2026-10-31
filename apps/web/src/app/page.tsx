@@ -184,13 +184,13 @@ export default function Home() {
       <section id="for-trainers" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
         <div className="grid gap-8 overflow-hidden rounded-3xl bg-primary p-8 text-primary-foreground md:grid-cols-[1.2fr_1fr] md:p-12">
           <div>
-            <p className="font-heading text-sm font-semibold tracking-wide uppercase opacity-80">
+            <p className="font-heading text-sm font-semibold tracking-wide uppercase opacity-95">
               For trainers
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-balance">
               Your schedule, your price, paid out after every session.
             </h2>
-            <p className="mt-3 max-w-md opacity-85">
+            <p className="mt-3 max-w-md opacity-95">
               Set your weekly hours once. Owners book open slots, and your payout is released when
               the consult is done.
             </p>
