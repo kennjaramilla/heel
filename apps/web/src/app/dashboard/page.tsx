@@ -21,7 +21,12 @@ const nextSteps: Record<
   { icon: typeof Dog; title: string; body: string; href?: string }[]
 > = {
   owner: [
-    { icon: Dog, title: 'Add your pet', body: 'Name, breed, age and what you need help with.' },
+    {
+      icon: Dog,
+      title: 'Your pets',
+      body: 'Name, breed, age and what you need help with.',
+      href: '/dashboard/pets',
+    },
     {
       icon: Search,
       title: 'Find a trainer',

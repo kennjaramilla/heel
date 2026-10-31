@@ -202,7 +202,33 @@ async function main() {
       .onConflictDoUpdate({ target: schema.trainerProfile.userId, set: profile });
   }
 
-  console.log(`Seeded ${trainers.length} trainers and ${owners.length} owner.`);
+  await db
+    .insert(schema.pet)
+    .values([
+      {
+        id: 'seed_pet_mochi',
+        ownerId: 'seed_owner',
+        name: 'Mochi',
+        species: 'dog',
+        breed: 'Shiba Inu',
+        bornOn: '2026-02-01',
+        concerns: ['leash-pulling', 'puppy-basics'],
+        notes: 'Pulls hardest when she sees other dogs. Great with people.',
+      },
+      {
+        id: 'seed_pet_pepper',
+        ownerId: 'seed_owner',
+        name: 'Pepper',
+        species: 'cat',
+        breed: 'Domestic shorthair',
+        bornOn: '2022-05-01',
+        concerns: ['litter-box'],
+        notes: 'Started skipping the litter box after we moved.',
+      },
+    ])
+    .onConflictDoNothing();
+
+  console.log(`Seeded ${trainers.length} trainers, ${owners.length} owner and 2 pets.`);
   process.exit(0);
 }
 
