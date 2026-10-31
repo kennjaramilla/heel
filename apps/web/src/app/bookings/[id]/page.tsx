@@ -171,6 +171,13 @@ async function BookingDetails({ params }: { params: PageProps<'/bookings/[id]'>[
         <Button variant="outline" asChild>
           <Link href="/dashboard/bookings">All bookings</Link>
         </Button>
+        {booking.status !== 'held' && booking.status !== 'expired' && (
+          <Button variant="ghost" asChild>
+            <Link href={`/dashboard/support/new?booking=${booking.id}`}>
+              Get help with this booking
+            </Link>
+          </Button>
+        )}
         {holdGone && booking.trainerSlug && (
           <Button asChild>
             <Link href={`/trainers/${booking.trainerSlug}`}>Pick another time</Link>

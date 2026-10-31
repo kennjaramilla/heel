@@ -8,3 +8,4 @@ export * from './time';
 export * from './booking';
 export * from './refunds';
 export * from './completion';
+export * from './support';

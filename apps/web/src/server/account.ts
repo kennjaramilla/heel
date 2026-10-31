@@ -4,8 +4,18 @@ import { and, eq, gt, inArray, or } from 'drizzle-orm';
 import { recordAudit } from './audit';
 import { getTrainingPlan } from './completion';
 
-const { user, session, account, pet, booking, trainerProfile, availabilityRule, blockedDate } =
-  schema;
+const {
+  user,
+  session,
+  account,
+  pet,
+  booking,
+  trainerProfile,
+  availabilityRule,
+  blockedDate,
+  supportTicket,
+  supportMessage,
+} = schema;
 
 /** Everything we hold about a person, as plain JSON they can download. */
 export async function exportAccountData(db: Db, userId: string) {
@@ -29,6 +39,18 @@ export async function exportAccountData(db: Db, userId: string) {
     db.select().from(availabilityRule).where(eq(availabilityRule.trainerId, userId)),
   ]);
   const plans = await Promise.all(bookings.map((b) => getTrainingPlan(db, b.id)));
+  const tickets = await db.select().from(supportTicket).where(eq(supportTicket.userId, userId));
+  const messages = tickets.length
+    ? await db
+        .select()
+        .from(supportMessage)
+        .where(
+          inArray(
+            supportMessage.ticketId,
+            tickets.map((t) => t.id),
+          ),
+        )
+    : [];
   return {
     exportedAt: new Date().toISOString(),
     account: me ?? null,
@@ -41,6 +63,12 @@ export async function exportAccountData(db: Db, userId: string) {
     })),
     bookings: bookings.map(({ paymentRef, refundRef, payoutRef, ...b }) => b),
     trainingPlans: plans.filter(Boolean),
+    supportRequests: tickets.map((t) => ({
+      ...t,
+      messages: messages
+        .filter((m) => m.ticketId === t.id)
+        .map(({ body, fromStaff, createdAt }) => ({ body, fromStaff, createdAt })),
+    })),
   };
 }
 
@@ -79,6 +107,7 @@ export async function deleteAccount(
     await tx.delete(availabilityRule).where(eq(availabilityRule.trainerId, userId));
     await tx.delete(blockedDate).where(eq(blockedDate.trainerId, userId));
     await tx.delete(trainerProfile).where(eq(trainerProfile.userId, userId));
+    await tx.delete(supportTicket).where(eq(supportTicket.userId, userId));
     await tx
       .update(user)
       .set({

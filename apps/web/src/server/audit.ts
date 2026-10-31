@@ -7,7 +7,7 @@ const { auditEvent, user } = schema;
 export type AuditInput = {
   actorId: string | null; // null = the system (e.g. the payouts job)
   action: string;
-  targetType: 'booking' | 'user' | 'payout';
+  targetType: 'booking' | 'user' | 'payout' | 'support_ticket';
   targetId: string;
   details?: Record<string, unknown>;
 };
