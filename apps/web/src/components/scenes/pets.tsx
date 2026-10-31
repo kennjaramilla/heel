@@ -141,9 +141,12 @@ export function Trainer({ armClassName }: { armClassName?: string }) {
       </g>
       <circle cx={28} cy={16} r={15} fill="#c98d66" />
       <path d="M13 14 C 14 0, 42 0, 43 14 C 36 8, 22 8, 13 14 Z" fill="#3b2a1e" />
-      <circle cx={23} cy={17} r={1.8} fill="#1d2522" />
+      <circle cx={22} cy={17} r={1.8} fill="#1d2522" />
+      <circle cx={33} cy={17} r={1.8} fill="#1d2522" />
+      <circle cx={19} cy={22} r={2.4} fill="#e8846f" opacity={0.5} />
+      <circle cx={36} cy={22} r={2.4} fill="#e8846f" opacity={0.5} />
       <path
-        d="M21 23 Q 25 26 29 23"
+        d="M24 23 Q 27.5 26.5 31 23"
         stroke="#1d2522"
         strokeWidth={1.5}
         fill="none"
