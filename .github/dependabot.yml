@@ -1,11 +1,15 @@
 version: 2
 updates:
+  # Majors (TypeScript, ESLint, Node types) are upgraded by hand with the code changes they need.
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     cooldown:
       default-days: 3
+    ignore:
+      - dependency-name: '*'
+        update-types: [version-update:semver-major]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -13,3 +17,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
