@@ -51,3 +51,12 @@ describe('sign-in', () => {
     ).rejects.toThrow();
   });
 });
+
+describe('mobile app', () => {
+  it('trusts the app scheme but not other schemes', async () => {
+    const { auth } = await setup();
+    const { trustedOrigins } = await auth.$context;
+    expect(trustedOrigins).toContain('heel://');
+    expect(trustedOrigins).not.toContain('evil://');
+  });
+});

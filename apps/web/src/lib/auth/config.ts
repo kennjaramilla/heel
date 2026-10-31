@@ -1,5 +1,6 @@
 import type { Db } from '@heel/db';
 import { schema } from '@heel/db';
+import { expo } from '@better-auth/expo';
 import { betterAuth } from 'better-auth';
 import { APIError } from 'better-auth/api';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -22,6 +23,9 @@ const ALLOWED_HOSTS = [
   'localhost:3000',
 ];
 
+// The Expo app's deep-link scheme; Expo Go (exp://) only outside production.
+const MOBILE_ORIGINS = ['heel://', ...(process.env.NODE_ENV === 'production' ? [] : ['exp://'])];
+
 export function createAuth(db: Db) {
   return betterAuth({
     database: drizzleAdapter(db, {
@@ -36,9 +40,12 @@ export function createAuth(db: Db) {
     }),
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: { allowedHosts: ALLOWED_HOSTS, fallback: PRODUCTION_URL },
-    trustedOrigins: ALLOWED_HOSTS.map((host) =>
-      host.startsWith('localhost') ? `http://${host}` : `https://${host}`,
-    ),
+    trustedOrigins: [
+      ...ALLOWED_HOSTS.map((host) =>
+        host.startsWith('localhost') ? `http://${host}` : `https://${host}`,
+      ),
+      ...MOBILE_ORIGINS,
+    ],
     emailAndPassword: { enabled: true, minPasswordLength: 8 },
     // Stored in Postgres so limits apply across all serverless instances, not per instance.
     rateLimit: {
@@ -86,7 +93,7 @@ export function createAuth(db: Db) {
         },
       },
     },
-    plugins: [nextCookies()],
+    plugins: [expo(), nextCookies()],
   });
 }
 
