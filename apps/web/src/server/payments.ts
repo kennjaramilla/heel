@@ -9,6 +9,8 @@ export interface PaymentProvider {
   name: string;
   label: string;
   startCheckout(booking: Booking): Promise<CheckoutResult>;
+  /** Returns the provider's refund reference. */
+  refund(booking: Booking, amountCents: number): Promise<string>;
 }
 
 /** Marks the booking as paid straight away. Used until a real provider is configured. */
@@ -17,6 +19,9 @@ export const demoPayments: PaymentProvider = {
   label: 'Demo payment (no card needed)',
   async startCheckout(booking) {
     return { kind: 'paid', paymentRef: `demo_${booking.id.slice(0, 8)}` };
+  },
+  async refund(booking, amountCents) {
+    return `demo_refund_${booking.id.slice(0, 8)}_${amountCents}`;
   },
 };
 
