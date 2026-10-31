@@ -1,43 +1,120 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
+/* Dark mode follows the OS setting, so shadcn's `dark:` classes use the media query. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+/* Heel palette: trusted green, warm cream, a playful amber and peach. */
 :root {
-  --background: #fdf9f3;
-  --foreground: #1c2421;
-  --muted: #5b6662;
-  --surface: #ffffff;
-  --border: #e7e0d5;
-  --brand: #1f6f5c;
-  --brand-foreground: #fdf6ec;
-  --accent: #e8a33d;
+  --radius: 0.875rem;
+  --background: #fbf7f0;
+  --foreground: #1d2522;
+  --card: #ffffff;
+  --card-foreground: #1d2522;
+  --popover: #ffffff;
+  --popover-foreground: #1d2522;
+  --primary: #1f6f5c;
+  --primary-foreground: #fbf7f0;
+  --secondary: #e4eee8;
+  --secondary-foreground: #1f4a3e;
+  --muted: #f3ede3;
+  --muted-foreground: #5f6b66;
+  --accent: #fde8d0;
+  --accent-foreground: #7a4310;
+  --destructive: #c8402f;
+  --border: #e8e0d3;
+  --input: #ddd3c4;
+  --ring: #1f6f5c;
+  --amber: #e8a33d;
+  --peach: #f6b896;
+  --chart-1: #1f6f5c;
+  --chart-2: #e8a33d;
+  --chart-3: #f08a6c;
+  --chart-4: #6aa5c9;
+  --chart-5: #9b7ad8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #121715;
+    --background: #111614;
     --foreground: #eef2ef;
-    --muted: #9aa6a1;
-    --surface: #1a211e;
-    --border: #2a332f;
-    --brand: #4fb39a;
-    --brand-foreground: #0d1412;
-    --accent: #f0b65c;
+    --card: #18201d;
+    --card-foreground: #eef2ef;
+    --popover: #18201d;
+    --popover-foreground: #eef2ef;
+    --primary: #5cc0a5;
+    --primary-foreground: #0c1311;
+    --secondary: #1f2b27;
+    --secondary-foreground: #cfe5dc;
+    --muted: #1c2421;
+    --muted-foreground: #9aa6a1;
+    --accent: #3a2a17;
+    --accent-foreground: #f6c88d;
+    --destructive: #f07a68;
+    --border: #26302c;
+    --input: #2f3a35;
+    --ring: #5cc0a5;
+    --amber: #f0b65c;
+    --peach: #e59a78;
   }
 }
 
 @theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-heading: var(--font-bricolage);
+  --font-mono: var(--font-geist-mono);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
-  --color-surface: var(--surface);
-  --color-border: var(--border);
-  --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
+  --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-amber: var(--amber);
+  --color-peach: var(--peach);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
 }

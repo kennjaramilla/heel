@@ -20,7 +20,9 @@ describe('splitPayment', () => {
 });
 
 describe('formatCents', () => {
-  it('formats cents as currency', () => {
-    expect(formatCents(4500)).toBe('$45.00');
+  it('drops .00 on whole amounts and keeps cents otherwise', () => {
+    expect(formatCents(4500)).toBe('$45');
+    expect(formatCents(4550)).toBe('$45.50');
+    expect(formatCents(5)).toBe('$0.05');
   });
 });

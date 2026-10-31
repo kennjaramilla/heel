@@ -20,7 +20,14 @@ export function splitPayment(
   return { platformFee, trainerPayout: amount - platformFee };
 }
 
+/** Formats cents as currency; whole amounts drop the ".00" ($45, $45.50). */
 export function formatCents(amount: Cents, currency = 'USD', locale = 'en-US'): string {
   assertCents(amount);
-  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount / 100);
+  const whole = amount % 100 === 0;
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: whole ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(amount / 100);
 }
