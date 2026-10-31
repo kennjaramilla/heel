@@ -4,6 +4,7 @@ import {
   CalendarClock,
   CreditCard,
   Dog,
+  LifeBuoy,
   Lock,
   Search,
   ShieldCheck,
@@ -82,12 +83,20 @@ const nextSteps: Record<
   ],
 };
 
-const accountStep: (typeof nextSteps)['owner'][number] = {
-  icon: Lock,
-  title: 'Account and privacy',
-  body: 'Password, sign-out everywhere, your data.',
-  href: '/dashboard/account',
-};
+const commonSteps: (typeof nextSteps)['owner'] = [
+  {
+    icon: LifeBuoy,
+    title: 'Help and support',
+    body: 'Ask about a booking, refund or your account.',
+    href: '/dashboard/support',
+  },
+  {
+    icon: Lock,
+    title: 'Account and privacy',
+    body: 'Password, sign-out everywhere, your data.',
+    href: '/dashboard/account',
+  },
+];
 
 export default function DashboardPage() {
   return (
@@ -114,7 +123,10 @@ async function Dashboard() {
       </div>
       {user.role === 'trainer' && <Earnings trainerId={user.id} />}
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[...nextSteps[user.role], accountStep].map(({ icon: Icon, title, body, href }) => (
+        {[
+          ...nextSteps[user.role],
+          ...(user.role === 'admin' ? commonSteps.slice(1) : commonSteps),
+        ].map(({ icon: Icon, title, body, href }) => (
           <li key={title} className="relative">
             {href && (
               <Link href={href} className="absolute inset-0 z-10 rounded-xl" aria-label={title} />
