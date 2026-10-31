@@ -1,7 +1,20 @@
-import { slugify, type TrainerProfileInput } from '@heel/core';
+import { PAGE_SIZE, slugify, type TrainerProfileInput, type TrainerSearch } from '@heel/core';
 import type { Db } from '@heel/db';
 import { schema } from '@heel/db';
-import { and, desc, eq, like, or } from 'drizzle-orm';
+import {
+  and,
+  arrayContains,
+  arrayOverlaps,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  like,
+  lte,
+  or,
+  type SQL,
+} from 'drizzle-orm';
 
 const { trainerProfile, user } = schema;
 
@@ -72,4 +85,60 @@ export async function listPublishedTrainers(db: Db, limit = 24): Promise<PublicT
     .orderBy(desc(trainerProfile.yearsExperience))
     .limit(limit);
   return rows.map((r) => ({ ...r.profile, name: r.name, image: r.image }));
+}
+
+/** Escapes % and _ so a search for "100%" doesn't match everything. */
+function escapeLike(text: string) {
+  return text.replace(/[\\%_]/g, (c) => `\\${c}`);
+}
+
+export async function searchTrainers(db: Db, search: TrainerSearch) {
+  const filters: SQL[] = [eq(trainerProfile.published, true)];
+  if (search.q) {
+    const pattern = `%${escapeLike(search.q)}%`;
+    filters.push(
+      or(
+        ilike(user.name, pattern),
+        ilike(trainerProfile.headline, pattern),
+        ilike(trainerProfile.bio, pattern),
+        ilike(trainerProfile.city, pattern),
+      )!,
+    );
+  }
+  if (search.species) filters.push(arrayContains(trainerProfile.species, [search.species]));
+  if (search.specialty.length)
+    filters.push(arrayOverlaps(trainerProfile.specialties, search.specialty));
+  if (search.language) filters.push(arrayContains(trainerProfile.languages, [search.language]));
+  if (search.maxPrice) filters.push(lte(trainerProfile.price60Cents, search.maxPrice * 100));
+  const where = and(...filters);
+
+  const orderBy = {
+    recommended: [desc(trainerProfile.yearsExperience), asc(trainerProfile.slug)],
+    'price-asc': [asc(trainerProfile.price60Cents), asc(trainerProfile.slug)],
+    'price-desc': [desc(trainerProfile.price60Cents), asc(trainerProfile.slug)],
+    experience: [desc(trainerProfile.yearsExperience), asc(trainerProfile.slug)],
+  }[search.sort];
+
+  const [rows, [{ total } = { total: 0 }]] = await Promise.all([
+    db
+      .select({ profile: trainerProfile, name: user.name, image: user.image })
+      .from(trainerProfile)
+      .innerJoin(user, eq(user.id, trainerProfile.userId))
+      .where(where)
+      .orderBy(...orderBy)
+      .limit(PAGE_SIZE)
+      .offset((search.page - 1) * PAGE_SIZE),
+    db
+      .select({ total: count() })
+      .from(trainerProfile)
+      .innerJoin(user, eq(user.id, trainerProfile.userId))
+      .where(where),
+  ]);
+
+  return {
+    trainers: rows.map((r): PublicTrainer => ({ ...r.profile, name: r.name, image: r.image })),
+    total,
+    page: search.page,
+    pageCount: Math.max(1, Math.ceil(total / PAGE_SIZE)),
+  };
 }
