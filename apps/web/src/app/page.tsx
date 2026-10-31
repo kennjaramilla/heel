@@ -1,4 +1,4 @@
-import { formatCents } from '@heel/core';
+import { formatCents, specialtyLabel } from '@heel/core';
 import {
   Bone,
   CalendarCheck,
@@ -31,17 +31,13 @@ import { TrainerCard } from '@/components/trainers/trainer-card';
 import { getCachedTrainers } from '@/server/cached';
 
 const specialties = [
-  { icon: Dog, label: 'Puppy basics', body: 'Potty training, biting, sleeping through the night.' },
-  { icon: Bone, label: 'Leash pulling', body: 'Calm walks without the tug-of-war.' },
-  {
-    icon: HeartHandshake,
-    label: 'Reactivity',
-    body: 'Barking and lunging at dogs, people or bikes.',
-  },
-  { icon: HomeIcon, label: 'Separation anxiety', body: 'A pet who panics when you leave.' },
-  { icon: Timer, label: 'Recall', body: 'Coming back the first time you call.' },
-  { icon: Cat, label: 'Cat behaviour', body: 'Scratching, litter box and multi-cat homes.' },
-];
+  { icon: Dog, id: 'puppy-basics', body: 'Potty training, biting, sleeping through the night.' },
+  { icon: Bone, id: 'leash-pulling', body: 'Calm walks without the tug-of-war.' },
+  { icon: HeartHandshake, id: 'reactivity', body: 'Barking and lunging at dogs, people or bikes.' },
+  { icon: HomeIcon, id: 'separation-anxiety', body: 'A pet who panics when you leave.' },
+  { icon: Timer, id: 'recall', body: 'Coming back the first time you call.' },
+  { icon: Cat, id: 'cat-behaviour', body: 'Scratching, litter box and multi-cat homes.' },
+] as const;
 
 const steps = [
   {
@@ -134,18 +130,20 @@ export default function Home() {
           body="Trainers list what they're best at, so you can find the right match fast."
         />
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {specialties.map(({ icon: Icon, label, body }) => (
-            <li
-              key={label}
-              className="flex gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40"
-            >
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-                <Icon className="size-5" aria-hidden="true" />
-              </span>
-              <div>
-                <h3 className="font-semibold">{label}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-              </div>
+          {specialties.map(({ icon: Icon, id, body }) => (
+            <li key={id}>
+              <Link
+                href={`/trainers?specialty=${id}`}
+                className="flex h-full gap-4 rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40"
+              >
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+                  <Icon className="size-5" aria-hidden="true" />
+                </span>
+                <span>
+                  <span className="block font-heading font-semibold">{specialtyLabel(id)}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{body}</span>
+                </span>
+              </Link>
             </li>
           ))}
         </ul>
