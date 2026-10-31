@@ -21,6 +21,7 @@ const holdErrors = {
   'slot-unavailable': 'That time was just taken. Please pick another.',
   'slot-taken':
     'That time was just taken, or you already have a consult then. Please pick another.',
+  'too-many-holds': 'You have a few unpaid holds already. Pay for or release one first.',
 } as const;
 
 export async function holdSlot(_prev: HoldState, form: FormData): Promise<HoldState> {
