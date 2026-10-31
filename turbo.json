@@ -4,7 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["DATABASE_URL", "BETTER_AUTH_SECRET"]
+      "env": ["DATABASE_URL", "DATABASE_URL_UNPOOLED", "BETTER_AUTH_SECRET"]
     },
     "lint": {},
     "typecheck": {},

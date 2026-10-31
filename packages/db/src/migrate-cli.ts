@@ -7,7 +7,8 @@ if (process.env.VERCEL && !process.env.DATABASE_URL) {
   process.exit(1);
 }
 
-const db = createDb();
+// Schema changes go over Neon's direct connection, not the connection pooler.
+const db = createDb(process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL);
 await migrate(db);
 console.log(process.env.DATABASE_URL ? 'Migrated Postgres.' : 'Migrated local PGlite.');
 process.exit(0);
