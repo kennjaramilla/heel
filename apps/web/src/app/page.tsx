@@ -200,7 +200,7 @@ export default function Home() {
               the consult is done.
             </p>
             <Button size="lg" variant="secondary" className="mt-6" asChild>
-              <Link href="#for-trainers">Become a trainer</Link>
+              <Link href="/sign-up?role=trainer">Become a trainer</Link>
             </Button>
           </div>
           <ul className="grid content-center gap-4">
