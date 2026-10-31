@@ -27,6 +27,13 @@ pnpm dev          # http://localhost:3000
 
 Other scripts: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm format`.
 
+End-to-end tests run the real user journeys (browse, book, pay, cancel, training plans, access rules) against a production build with a fresh seeded database, plus axe accessibility checks and a CSP-violation check on every page:
+
+```bash
+pnpm exec playwright install chromium   # once
+pnpm build && pnpm e2e
+```
+
 ## Repo layout
 
 ```
