@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { HowItWorksVideo } from '@/components/scenes/how-it-works-video';
 import { CatTarget, Fetch, LeashWalk } from '@/components/scenes/mini-scenes';
 import { s as scenes } from '@/components/scenes/classes';
 import { TrainingYard } from '@/components/scenes/training-yard';
@@ -172,6 +173,7 @@ export default function Home() {
 
       <section id="how-it-works" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
         <SectionHeading eyebrow="How it works" title="From problem to plan in four steps" />
+        <HowItWorksVideo />
         <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map(({ icon: Icon, title, body }, i) => (
             <li key={title} className="relative rounded-2xl border border-border bg-card p-6">

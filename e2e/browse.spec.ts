@@ -35,3 +35,12 @@ for (const path of ['/', '/trainers', '/trainers/sam-villanueva', '/sign-in', '/
     expect(serious.map((v) => `${v.id}: ${v.nodes.length} element(s)`)).toEqual([]);
   });
 }
+
+test('the how-it-works video is on the home page and served', async ({ page, request }) => {
+  await page.goto('/');
+  const video = page.locator('#how-it-works video');
+  await expect(video).toHaveAttribute('poster', '/video/how-it-works-poster.jpg');
+  await expect(page.getByRole('button', { name: /(Play|Pause) video/ })).toBeVisible();
+  const mp4 = await request.get('/video/how-it-works.mp4');
+  expect(mp4.headers()['content-type']).toContain('video/mp4');
+});
