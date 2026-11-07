@@ -16,7 +16,7 @@
     "migrate": "tsx src/migrate-cli.ts"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.5.12",
+    "@electric-sql/pglite": "^0.5.15",
     "drizzle-orm": "^0.45.4",
     "pg": "^8.23.1"
   },
@@ -26,6 +26,6 @@
     "drizzle-kit": "^0.31.11",
     "tsx": "4.23.15",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   }
 }
